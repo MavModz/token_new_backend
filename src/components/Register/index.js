@@ -5,13 +5,14 @@ import { useToasts } from "react-toast-notifications";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFetching } from "../../redux/reducer/fetching";
+import { AUTH_TOKEN_KEY } from "../../constant";
 
 const Register = () => {
   const mobileNumber = useSelector((state) => state.mobileNumber.number);
   // console.log(mobileNumber);
   const convertedNumber = mobileNumber.replace("+91", "");
   const [user, setUser] = useState({
-    mob: "",
+    mobile: "",
     name: "",
     DOB: "",
     email: "",
@@ -32,18 +33,23 @@ const Register = () => {
     const month = dobParts[1];
     const year = dobParts[2];
     const DOB = `${day}-${month}-${year}`;
-    const mob = convertedNumber;
+    const mobile = convertedNumber;
     // Create a new object with the updated user data
-    const updatedUser = { ...user, mob, DOB };
+    const updatedUser = { ...user, mobile, DOB };
     // Perform the registration logic with the updated user data
     // Reset the form after registration
-    setUser({ mob: "", name: "", DOB: "", email: "" });
+    setUser({ mobile: "", name: "", DOB: "", email: "" });
     register(updatedUser)
       .then((response) => {
+        console.log(response);
         if (response.status === 201) {
           addToast("User successfully created!", { appearance: "success" });
           dispatch(setFetching(false));
-          navigate("/account");
+          const authToken = response.data.token;
+          localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+          if (authToken) {
+            navigate("/account");
+          }
         }
       })
       .catch((error) => {
