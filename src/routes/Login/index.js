@@ -6,8 +6,11 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { useToasts } from "react-toast-notifications";
 import Register from "../../components/Register";
 import { useDispatch } from "react-redux";
-import { setMobileNumber } from "../../redux/reducer/mobileNumberReducer";
+import { setMobileNumber } from "../../redux/reducer/mobileNumber";
+import { setFetching } from "../../redux/reducer/fetching";
 import { checkIfUserExists } from "../../Api/api";
+import { useNavigate } from "react-router-dom";
+import { AUTH_TOKEN_KEY } from "../../constant";
 
 const Login = () => {
   const { addToast } = useToasts();
@@ -21,8 +24,9 @@ const Login = () => {
   const recaptchaVerifierRef = useRef(null);
   const confirmationResultRef = useRef(null);
 
+  // const fetching = useSelector((state) => state.fetching);
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   useEffect(() => {
     recaptchaVerifierRef.current = new RecaptchaVerifier(
       "recaptcha-container",
@@ -70,22 +74,29 @@ const Login = () => {
     if (e) {
       e.preventDefault();
     }
-
+    dispatch(setFetching(true));
     const formatPh = phoneNumber;
     const convertedNumber = formatPh.replace("+91", "");
     try {
       const response = await checkIfUserExists(convertedNumber);
-    } catch (error) {
-      if (error.response.status === 409) {
+      console.log(response);
+      if (response.status === 200) {
         addToast("Congratulations! You have successfully logged in!", {
           appearance: "success",
         });
-      } else if (error.response.status === 404) {
-        addToast("User does not exist in the database", {
-          appearance: "error",
-        });
-        sendOTP(formatPh);
+        dispatch(setFetching(false));
+        const authToken = response.data.token;
+        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        // console.log(authToken);
+        if (authToken) {
+          navigate("/account");
+        }
       }
+    } catch (error) {
+      addToast("User does not exist in the database", {
+        appearance: "error",
+      });
+      sendOTP(formatPh);
     }
   };
 
@@ -95,11 +106,12 @@ const Login = () => {
       .then((confirmationResult) => {
         confirmationResultRef.current = confirmationResult;
         // Assign confirmationResult to confirmationResultRef.current
+        dispatch(setFetching(false));
         addToast("OTP sent successfully!", {
           appearance: "success",
         });
-        setShow(true);
         setInputEnable(false);
+        setShow(true);
       })
       .catch((error) => {
         console.log("Firebase error:", error.message, error);
@@ -111,6 +123,7 @@ const Login = () => {
   };
 
   const onOTPVerify = (e) => {
+    dispatch(setFetching(true));
     e.preventDefault();
     if (confirmationResultRef.current) {
       // Check if confirmationResultRef.current is not null
@@ -122,20 +135,15 @@ const Login = () => {
             addToast("Mobile OTP Verified Successfully!", {
               appearance: "success",
             });
+            dispatch(setFetching(false));
             dispatch(setMobileNumber(phoneNumber));
             setUser(res.user);
-
-            // Execute statements when OTP is true
-            // ...
           })
           .catch((err) => {
             console.log(err);
             addToast("Invalid OTP. Please enter the correct code.", {
               appearance: "error",
             });
-
-            // Execute statements when OTP is false
-            // ...
           });
       } else {
         addToast("Please enter a valid 6-digit OTP.", {

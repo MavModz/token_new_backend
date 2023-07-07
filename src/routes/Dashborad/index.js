@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const Dashborad = () => {
-  return (
-    <div></div>
-  )
-}
+  return <div>Hi i am Dashborad</div>;
+};
 
-export default Dashborad
+export default Dashborad;

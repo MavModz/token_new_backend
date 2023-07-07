@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { register } from "../../Api/api";
 import { useToasts } from "react-toast-notifications";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { setFetching } from "../../redux/reducer/fetching";
+
 const Register = () => {
   const mobileNumber = useSelector((state) => state.mobileNumber.number);
   // console.log(mobileNumber);
@@ -12,6 +16,8 @@ const Register = () => {
     DOB: "",
     email: "",
   });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { addToast } = useToasts();
   const getUserData = (event) => {
     const { name, value } = event.target;
@@ -20,29 +26,29 @@ const Register = () => {
 
   const handleRegister = (e) => {
     e.preventDefault();
+    dispatch(setFetching(true));
     const dobParts = user.DOB.split("-");
     const day = dobParts[0];
     const month = dobParts[1];
     const year = dobParts[2];
     const DOB = `${day}-${month}-${year}`;
     const mob = convertedNumber;
-
     // Create a new object with the updated user data
     const updatedUser = { ...user, mob, DOB };
-
     // Perform the registration logic with the updated user data
-    // ...
-
     // Reset the form after registration
     setUser({ mob: "", name: "", DOB: "", email: "" });
     register(updatedUser)
       .then((response) => {
         if (response.status === 201) {
           addToast("User successfully created!", { appearance: "success" });
+          dispatch(setFetching(false));
+          navigate("/account");
         }
       })
       .catch((error) => {
         addToast("User already exists!", { appearance: "error" });
+        dispatch(setFetching(false));
       });
     // Print the updated user data
     console.log(updatedUser);
