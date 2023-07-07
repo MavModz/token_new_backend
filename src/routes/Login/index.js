@@ -119,6 +119,7 @@ const Login = () => {
         addToast("Failed to send OTP. Please try again later.", {
           appearance: "error",
         });
+        dispatch(setFetching(false));
       });
   };
 
