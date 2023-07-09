@@ -11,6 +11,9 @@ import { setFetching } from "../../redux/reducer/fetching";
 import { checkIfUserExists } from "../../Api/api";
 import { useNavigate } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "../../constant";
+import { useSelector } from "react-redux";
+import { setAuthToken } from "../../redux/reducer/auth";
+import { v4 as uuidv4 } from "uuid";
 
 const Login = () => {
   const { addToast } = useToasts();
@@ -24,9 +27,9 @@ const Login = () => {
   const recaptchaVerifierRef = useRef(null);
   const confirmationResultRef = useRef(null);
 
-  // const fetching = useSelector((state) => state.fetching);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const authToken = useSelector((state) => state.auth.authToken);
   useEffect(() => {
     recaptchaVerifierRef.current = new RecaptchaVerifier(
       "recaptcha-container",
@@ -36,6 +39,7 @@ const Login = () => {
       auth
     );
   }, []);
+  console.log(authToken);
 
   const isIndianPhoneNumber = (phoneNumber) => {
     const regex = /^\+91[6-9]\d{9}$/;
@@ -70,36 +74,6 @@ const Login = () => {
     setIsFocused(false);
   };
 
-  const onSignup = async (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-    dispatch(setFetching(true));
-    const formatPh = phoneNumber;
-    const convertedNumber = formatPh.replace("+91", "");
-    try {
-      const response = await checkIfUserExists(convertedNumber);
-      console.log(response);
-      if (response.status === 200) {
-        addToast("Congratulations! You have successfully logged in!", {
-          appearance: "success",
-        });
-        dispatch(setFetching(false));
-        const authToken = response.data.token;
-        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
-        // console.log(authToken);
-        if (authToken) {
-          navigate("/account");
-        }
-      }
-    } catch (error) {
-      addToast("User does not exist in the database", {
-        appearance: "error",
-      });
-      sendOTP(formatPh);
-    }
-  };
-
   const sendOTP = (formatPh) => {
     const appVerifier = recaptchaVerifierRef.current;
     signInWithPhoneNumber(auth, formatPh, appVerifier)
@@ -121,6 +95,38 @@ const Login = () => {
         });
         dispatch(setFetching(false));
       });
+  };
+
+  const onSignup = async (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    dispatch(setFetching(true));
+    const formatPh = phoneNumber;
+    const convertedNumber = formatPh.replace("+91", "");
+    try {
+      const response = await checkIfUserExists(convertedNumber);
+      console.log(response);
+      if (response.status === 200) {
+        addToast("Congratulations! You have successfully logged in!", {
+          appearance: "success",
+          key: uuidv4(), // Generate unique key
+        });
+        const authToken = response.data.token;
+        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        dispatch(setAuthToken(authToken)); // Dispatch the action to update the authToken
+        dispatch(setFetching(false));
+        if (authToken) {
+          navigate("/dashboard");
+        }
+      }
+    } catch (error) {
+      addToast("User does not exist in the database", {
+        appearance: "error",
+        key: uuidv4(), // Generate unique key
+      });
+      sendOTP(formatPh);
+    }
   };
 
   const onOTPVerify = (e) => {
@@ -171,7 +177,7 @@ const Login = () => {
           </div>
         </a>
       </div>
-      <div className="row">
+      <div className="row_">
         <div className="img-holder">
           <div className="bg"></div>
           <div className="info-holder"></div>
@@ -190,7 +196,7 @@ const Login = () => {
                   </p>
                   <form>
                     <input
-                      className="form-control"
+                      className="form-control_"
                       type="text"
                       name="number"
                       placeholder="Enter Phone Number"
@@ -207,7 +213,7 @@ const Login = () => {
                       </span>
                     )}
                     <input
-                      className="form-control"
+                      className="form-control_"
                       type="number"
                       name="otp"
                       onChange={handleOtpChange}

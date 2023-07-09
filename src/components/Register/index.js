@@ -48,7 +48,7 @@ const Register = () => {
           const authToken = response.data.token;
           localStorage.setItem(AUTH_TOKEN_KEY, authToken);
           if (authToken) {
-            navigate("/account");
+            navigate("/dashboard");
           }
         }
       })
