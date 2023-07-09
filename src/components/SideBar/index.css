@@ -1,0 +1,80 @@
+.vertical-menu {
+  width: 240px;
+  z-index: 1001;
+  background: #252b3b;
+  bottom: 0;
+  margin-top: 0;
+  position: fixed;
+  top: 70px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.vertical-collpsed .vertical-menu {
+  position: absolute;
+  width: 70px !important;
+  z-index: 5;
+  background: #252b3b;
+}
+
+#sidebar-menu {
+  padding: 10px 0 30px;
+}
+
+.metismenu {
+  margin: 0;
+}
+
+.metismenu li {
+  display: block;
+  width: 100%;
+}
+
+.isActive {
+  color: #d7e4ec;
+}
+
+.inActive {
+  color: #8590a5;
+}
+
+.list-inline,
+.list-unstyled {
+  padding-left: 0;
+  list-style: none;
+}
+
+.sidebar-route {
+  display: block;
+  padding: 0.625rem 1.5rem;
+  color: #74788d;
+  position: relative;
+  font-size: 13.3px;
+  transition: all 0.4s;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+}
+
+.menu-title {
+  padding: 12px 20px !important;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  cursor: default;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #505d69;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  opacity: 0.5;
+}
+/* media query here */
+@media (max-width: 992px) {
+  .vertical-menu {
+    display: none;
+  }
+}
+
+@media (max-width: 992px) {
+  body.sidebar-enable .vertical-menu {
+    display: block;
+  }
+}
