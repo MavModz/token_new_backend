@@ -3,6 +3,7 @@ import "./index.css";
 import { RiMenu2Fill } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
 import { IoIosArrowDown } from "react-icons/io";
+import { FiSearch } from "react-icons/fi";
 import { RiWallet3Line, RiShutDownLine } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
 import LogoDark from "../../assets/header/logo-sm-dark.png";
@@ -12,8 +13,8 @@ import LogoNazoxLight from "../../assets/header/logo-light.png";
 import { Link } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import { toggleSidebar } from "../../redux/reducer/sidebar";
 const Header = ({ onLogout }) => {
   const [show, setShow] = useState(true);
   const [searchBar, setSearchBar] = useState(false);
@@ -36,29 +37,45 @@ const Header = ({ onLogout }) => {
     });
   };
 
+  const dispatch = useDispatch();
+  const isOpen = useSelector((state) => state.sidebar.isOpen);
+
+  const handleToggleSidebar = () => {
+    dispatch(toggleSidebar());
+  };
   return (
     <header id="page-topbar">
       <div className="navbar-header">
         <div className="d-flex">
-          <div className="navbar-brand-box">
+          <div
+            className={`${
+              isOpen ? "navbar-brand-box" : "navbar-brand-box-hide"
+            }`}
+          >
             <a className="logo logo-dark">
-              <span className="logo-sm">
-                <img src={LogoDark} alt="" height="20" />
-              </span>
-              <span className="logo-lg">
-                <img src={LogoNazoxLight} alt="" width={110} />
-              </span>
+              {isOpen ? (
+                <span className="logo-lg">
+                  <img src={LogoNazoxLight} alt="" width={110} />
+                </span>
+              ) : (
+                <span className="logo-sm">
+                  <img src={LogoDark} alt="" height="20" />
+                </span>
+              )}
             </a>
-            <a className="logo logo-light">
+            {/* <a className="logo logo-light">
               <span className="logo-sm">
                 <img src={LogoLight} alt="" />
               </span>
               <span className="logo-lg">
                 <img src={LogoNazoxDark} alt="" />
               </span>
-            </a>
+            </a> */}
           </div>
-          <button className="px-3 font-size-24 header-item waves-effect btn btn-none btn-sm">
+          <button
+            onClick={handleToggleSidebar}
+            className="px-3 font-size-24 header-item waves-effect btn btn-none btn-sm"
+          >
             <RiMenu2Fill fontSize={28} />
           </button>
           <form className="app-search d-none d-lg-block">
@@ -84,8 +101,8 @@ const Header = ({ onLogout }) => {
             <div
               className={`${
                 searchBar
-                  ? "dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
-                  : "dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 show"
+                  ? "dropdown-menu dropdown-menu-lg dropdown-menu-end p-0 show"
+                  : "dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
               }`}
             >
               <form className="p-3">
@@ -97,7 +114,7 @@ const Header = ({ onLogout }) => {
                     />
                     <div className="input-group-append">
                       <button className="btn btn-primary">
-                        <CiSearch fontSize={35} />
+                        <FiSearch fontSize={15} />
                       </button>
                     </div>
                   </div>

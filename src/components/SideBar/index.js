@@ -78,20 +78,22 @@
 
 import React, { useState } from "react";
 import "./index.css";
-import { MdOutlineDashboard } from "react-icons/md";
+import { MdOutlineDashboard, MdOutlinePeopleAlt } from "react-icons/md";
 import { AiOutlineCalendar, AiOutlineMail } from "react-icons/ai";
 import { RiShoppingCartLine, RiChat1Line } from "react-icons/ri";
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Sidebar = () => {
   const [active, setActive] = useState(""); // Initialize active state as an empty string
+  const isOpen = useSelector((state) => state.sidebar.isOpen);
 
   const handleClick = (menuItem) => {
     setActive(menuItem); // Set the clicked menu item as active
   };
 
   return (
-    <div className="vertical-menu">
+    <div className={`${isOpen ? "vertical-menu" : "vertical-menu-hide"}`}>
       <div className="h-100 mm-active">
         <div className="mm-active">
           <ul className="metismenu list-unstyled mm-show mm-active">
@@ -104,13 +106,13 @@ const Sidebar = () => {
               >
                 <MdOutlineDashboard
                   fontSize={20}
-                  className={active === "dashboard" ? "isActive " : "inActive "}
+                  className={active === "dashboard" ? "isActive" : "inActive"}
                 />
                 <span className="badge rounded-pill bg-success float-end"></span>
                 <span
-                  className={
+                  className={`${
                     active === "dashboard" ? "isActive ms-3" : "inActive ms-3"
-                  }
+                  } ${isOpen ? "" : "display-none"}`}
                 >
                   Dashboard
                 </span>
@@ -118,61 +120,65 @@ const Sidebar = () => {
             </li>
             <li className="">
               <NavLink
-                to="calendar"
-                onClick={() => handleClick("calendar")}
+                to="manageteam"
+                onClick={() => handleClick("manageteam")}
                 className="sidebar-route"
               >
-                <AiOutlineCalendar
+                <MdOutlinePeopleAlt
                   fontSize={20}
-                  className={active === "calendar" ? "isActive " : "inActive "}
+                  className={active === "manageteam" ? "isActive" : "inActive"}
                 />
                 <span className="badge rounded-pill bg-success float-end"></span>
                 <span
-                  className={
-                    active === "calendar" ? "isActive ms-3" : "inActive ms-3"
-                  }
+                  className={`${
+                    active === "manageteam" ? "isActive ms-3" : "inActive ms-3"
+                  } ${isOpen ? "" : "display-none"}`}
                 >
-                  Calendar
+                  ManageTeam
                 </span>
               </NavLink>
             </li>
             <li className="">
               <NavLink
-                to=""
+                to="profileform"
                 onClick={() => handleClick("chat")}
                 className="sidebar-route"
               >
                 <RiChat1Line
                   fontSize={20}
-                  className={active === "chat" ? "isActive " : "inActive "}
+                  className={active === "profileform" ? "isActive" : "inActive"}
                 />
                 <span className="badge rounded-pill bg-success float-end"></span>
                 <span
-                  className={
-                    active === "chat" ? "isActive ms-3" : "inActive ms-3"
-                  }
+                  className={`${
+                    active === "profileform" ? "isActive ms-3" : "inActive ms-3"
+                  } ${isOpen ? "" : "display-none"}`}
                 >
-                  Chat
+                  Profile-Form
                 </span>
               </NavLink>
             </li>
             <li className="">
               <NavLink
-                to=""
-                onClick={() => handleClick("ecommerce")}
+                to="invoicebalance"
+                onClick={() => handleClick("invoicebalance")}
                 className="sidebar-route"
               >
                 <RiShoppingCartLine
                   fontSize={20}
-                  className={active === "ecommerce" ? "isActive " : "inActive "}
+                  className={
+                    active === "invoicebalance" ? "isActive" : "inActive"
+                  }
                 />
                 <span className="badge rounded-pill bg-success float-end"></span>
                 <span
-                  className={
-                    active === "ecommerce" ? "isActive ms-3" : "inActive ms-3"
-                  }
+                  className={`${
+                    active === "invoicebalance"
+                      ? "isActive ms-3"
+                      : "inActive ms-3"
+                  } ${isOpen ? "" : "display-none"}`}
                 >
-                  Ecommerce
+                  InvoiceBalance
                 </span>
               </NavLink>
             </li>
@@ -184,13 +190,13 @@ const Sidebar = () => {
               >
                 <AiOutlineMail
                   fontSize={20}
-                  className={active === "email" ? "isActive " : "inActive "}
+                  className={active === "email" ? "isActive" : "inActive"}
                 />
                 <span className="badge rounded-pill bg-success float-end"></span>
                 <span
-                  className={
+                  className={`${
                     active === "email" ? "isActive ms-3" : "inActive ms-3"
-                  }
+                  } ${isOpen ? "" : "display-none"}`}
                 >
                   Email
                 </span>

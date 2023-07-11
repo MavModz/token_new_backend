@@ -2,7 +2,7 @@ import React from "react";
 
 const Calendar = () => {
   return (
-    <div>
+    <section>
       <p>
         Calendar Lorem ipsum, dolor sit amet consectetur adipisicing elit. Omnis
         at molestias eius, delectus inventore sapiente adipisci dolores vero
@@ -66,7 +66,7 @@ const Calendar = () => {
         Minima iure odit a animi nisi corporis itaque ducimus necessitatibus
         dolore, iusto ipsam architecto eaque facere?
       </p>
-    </div>
+    </section>
   );
 };
 

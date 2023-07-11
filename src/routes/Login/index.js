@@ -39,7 +39,12 @@ const Login = () => {
       auth
     );
   }, []);
-  console.log(authToken);
+  // console.log(authToken);
+
+  useEffect(() => {
+    localStorage.getItem("auth_token") &&
+      navigate("/dashboard", { replace: true });
+  }, [navigate, authToken]);
 
   const isIndianPhoneNumber = (phoneNumber) => {
     const regex = /^\+91[6-9]\d{9}$/;
@@ -168,7 +173,7 @@ const Login = () => {
   };
 
   return (
-    <div className="form-body">
+    <section className="form-body">
       <div className="website-logo">
         <div className="recaptcha-container" id="recaptcha-container"></div>
         <a href="index.html">
@@ -251,7 +256,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
