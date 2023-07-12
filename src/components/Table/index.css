@@ -152,6 +152,12 @@ tbody > tr {
   cursor: not-allowed;
 }
 
+.status-text-approved {
+  display: flex;
+  align-items: center;
+  min-width: 117px;
+  color: #4caf50;
+}
 .status-button-approved {
   display: flex;
   align-items: center;
