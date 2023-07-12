@@ -691,7 +691,7 @@ const MultiStepForm = () => {
                         onChange={handleFileChange}
                         required
                       />
-                      <label htmlFor="companyLogo">Company Logo:</label>
+                      {/* <label htmlFor="companyLogo">Company Logo:</label> */}
                     </div>
                   </div>
                 </div>
@@ -734,9 +734,9 @@ const MultiStepForm = () => {
                         onChange={handleFileChange}
                         required
                       />
-                      <label htmlFor="ownerProfileImage">
+                      {/* <label htmlFor="ownerProfileImage">
                         Owner Profile Image:
-                      </label>
+                      </label> */}
                     </div>
                   </div>
                 </div>
@@ -778,12 +778,12 @@ const MultiStepForm = () => {
                         onChange={handleFileChange}
                         required
                       />
-                      <label
+                      {/* <label
                         htmlFor="productImage"
                         className="file-input-label"
                       >
                         Product Image
-                      </label>
+                      </label> */}
                     </div>
                     <div className="form-col">
                       <input

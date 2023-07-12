@@ -1,30 +1,14 @@
 import React, { useState } from "react";
 import "./index.css";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
-import { MdOutlineThumbUpOffAlt } from "react-icons/md";
-import { BsHourglassSplit } from "react-icons/bs";
-const Table = () => {
+import {
+  MdOutlineThumbUpOffAlt,
+  MdOutlineThumbDownOffAlt,
+} from "react-icons/md";
+import { BsHourglassSplit, BsDot } from "react-icons/bs";
+const Table = ({ data }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
-  // Sample data for the table
-  const data = [
-    { id: 1, column1: "Data 1", column2: "Data 2", column3: "Data 3" },
-    { id: 2, column1: "Data 4", column2: "Data 5", column3: "Data 6" },
-    { id: 3, column1: "Data 7", column2: "Data 8", column3: "Data 9" },
-    { id: 4, column1: "Data 10", column2: "Data 11", column3: "Data 12" },
-    { id: 5, column1: "Data 13", column2: "Data 14", column3: "Data 15" },
-    { id: 6, column1: "Data 16", column2: "Data 17", column3: "Data 18" },
-    { id: 7, column1: "Data 19", column2: "Data 20", column3: "Data 21" },
-    { id: 8, column1: "Data 10", column2: "Data 11", column3: "Data 12" },
-    { id: 9, column1: "Data 13", column2: "Data 14", column3: "Data 15" },
-    { id: 10, column1: "Data 16", column2: "Data 17", column3: "Data 18" },
-    { id: 11, column1: "Data 19", column2: "Data 20", column3: "Data 21" },
-    { id: 12, column1: "Data 10", column2: "Data 11", column3: "Data 12" },
-    { id: 13, column1: "Data 13", column2: "Data 14", column3: "Data 15" },
-    { id: 14, column1: "Data 16", column2: "Data 17", column3: "Data 18" },
-    { id: 15, column1: "Data 19", column2: "Data 20", column3: "Data 21" },
-  ];
 
   // Pagination
   const lastIndex = currentPage * itemsPerPage;
@@ -126,35 +110,64 @@ const Table = () => {
               </th>
               <th>ID</th>
               <th>Name</th>
-              <th>Age</th>
-              <th>Phone Number</th>
               <th>Email</th>
+              <th>Phone Number</th>
+              <th>Componey</th>
               <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody className="table-body">
-            {currentData.map((row) => (
-              <tr className="body-tr" key={row.id}>
-                <td>
-                  <input type="checkbox" id="checkbox" />
-                </td>
-                <td>{row.id}</td>
-                <td>{row.column1}</td>
-                <td>{row.column2}</td>
-                <td>{row.column3}</td>
-                <td>{row.column3}</td>
-                <td>
-                  {/* <button className="status-button-approved">
-                    <MdOutlineThumbUpOffAlt />
-                    &nbsp; Approve
-                  </button> */}
-                  <button className="status-button-pending">
-                    <BsHourglassSplit />
-                    &nbsp; Pending
-                  </button>
+            {data.length > 0 ? (
+              data.map((user, index) => (
+                <tr className="body-tr" key={index}>
+                  {console.log(user)}
+                  <td>
+                    <input type="checkbox" id="checkbox" />
+                  </td>
+                  <td>{index + 1}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phoneNumber}</td>
+                  <td>{user.companyName}</td>
+                  <td>
+                    {user.status == "compeleted" ? (
+                      <span className="status-text-approved">
+                        <MdOutlineThumbUpOffAlt />
+                        &nbsp; Approved
+                      </span>
+                    ) : (
+                      <span className="status-text-pending">
+                        <BsDot fontSize={20} />
+                        &nbsp; Active
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    {user.status == "compeleted" ? (
+                      <button className="status-button-approved">
+                        <MdOutlineThumbUpOffAlt />
+                        &nbsp; Approve
+                      </button>
+                    ) : (
+                      <button className="status-button-pending">
+                        <MdOutlineThumbDownOffAlt />
+                        &nbsp; Reject
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr
+                className="body-tr"
+                style={{ position: "relative", background: "none" }}
+              >
+                <td style={{ position: "absolute", top: "12px", left: "50%" }}>
+                  <span style={{ color: "red" }}>No Data</span>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
