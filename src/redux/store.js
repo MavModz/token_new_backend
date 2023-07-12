@@ -4,6 +4,7 @@ import fetching from "./reducer/fetching.js";
 import mobileNumber from "./reducer/mobileNumber.js";
 import auth from "./reducer/auth.js";
 import sidebar from "./reducer/sidebar.js";
+import role from "./reducer/role.js";
 
 // Create the logger instance
 const logger = createLogger();
@@ -15,6 +16,7 @@ const store = configureStore({
     fetching: fetching,
     auth: auth,
     sidebar: sidebar,
+    role: role,
   },
   middleware: [logger],
 });

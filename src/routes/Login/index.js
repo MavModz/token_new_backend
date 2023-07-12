@@ -8,12 +8,14 @@ import Register from "../../components/Register";
 import { useDispatch } from "react-redux";
 import { setMobileNumber } from "../../redux/reducer/mobileNumber";
 import { setFetching } from "../../redux/reducer/fetching";
-import { checkIfUserExists } from "../../Api/api";
+import { checkIfUserExists } from "../../Api/userApi";
+import { checkIfAdminExists } from "../../Api/adminApi";
 import { useNavigate } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "../../constant";
 import { useSelector } from "react-redux";
 import { setAuthToken } from "../../redux/reducer/auth";
 import { v4 as uuidv4 } from "uuid";
+import { loginAdmin, loginUser } from "../../redux/reducer/role";
 
 const Login = () => {
   const { addToast } = useToasts();
@@ -30,6 +32,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.authToken);
+ 
+  // console.log(role.admin);
   useEffect(() => {
     recaptchaVerifierRef.current = new RecaptchaVerifier(
       "recaptcha-container",
@@ -79,9 +83,9 @@ const Login = () => {
     setIsFocused(false);
   };
 
-  const sendOTP = (formatPh) => {
+  const sendOTP = (phoneNumber) => {
     const appVerifier = recaptchaVerifierRef.current;
-    signInWithPhoneNumber(auth, formatPh, appVerifier)
+    signInWithPhoneNumber(auth, phoneNumber, appVerifier)
       .then((confirmationResult) => {
         confirmationResultRef.current = confirmationResult;
         // Assign confirmationResult to confirmationResultRef.current
@@ -102,24 +106,26 @@ const Login = () => {
       });
   };
 
-  const onSignup = async (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-    dispatch(setFetching(true));
+  const onSignup = async (phoneNumber) => {
     const formatPh = phoneNumber;
     const convertedNumber = formatPh.replace("+91", "");
+    dispatch(setFetching(true));
+
     try {
       const response = await checkIfUserExists(convertedNumber);
       console.log(response);
       if (response.status === 200) {
-        addToast("Congratulations! You have successfully logged in!", {
-          appearance: "success",
-          key: uuidv4(), // Generate unique key
-        });
+        addToast(
+          "Congratulations! You have successfully logged in as a User!",
+          {
+            appearance: "success",
+            key: uuidv4(), // Generate unique key
+          }
+        );
         const authToken = response.data.token;
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         dispatch(setAuthToken(authToken)); // Dispatch the action to update the authToken
+        dispatch(loginUser(true));
         dispatch(setFetching(false));
         if (authToken) {
           navigate("/dashboard");
@@ -130,7 +136,40 @@ const Login = () => {
         appearance: "error",
         key: uuidv4(), // Generate unique key
       });
-      sendOTP(formatPh);
+      sendOTP(phoneNumber);
+    }
+  };
+
+  const onLogin = async (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    dispatch(setFetching(true));
+    const formatPh = phoneNumber;
+    const convertedNumber = formatPh.replace("+91", "");
+    try {
+      const response = await checkIfAdminExists(convertedNumber);
+      console.log(response);
+      if (response.status === 200) {
+        addToast("Congratulations! You have successfully logged in as Admin!", {
+          appearance: "success",
+          key: uuidv4(), // Generate unique key
+        });
+        const authToken = response.data.token;
+        localStorage.setItem(AUTH_TOKEN_KEY, authToken);
+        dispatch(setAuthToken(authToken)); // Dispatch the action to update the authToken
+        dispatch(loginAdmin(true));
+        dispatch(setFetching(false));
+        if (authToken) {
+          navigate("/dashboard");
+        }
+      }
+    } catch (error) {
+      addToast("Admin does not exist in the database", {
+        appearance: "error",
+        key: uuidv4(), // Generate unique key
+      });
+      onSignup(phoneNumber);
     }
   };
 
@@ -169,7 +208,7 @@ const Login = () => {
 
   const handleSignupClick = (e) => {
     e.preventDefault();
-    onSignup();
+    onLogin();
   };
 
   return (

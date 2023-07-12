@@ -1,13 +1,21 @@
 import React, { useLayoutEffect } from "react";
+import AnimatedButton from "../../components/AnimatedButton";
+import DashboardForm from "../../components/DashboardForm";
+import MultiStepForm from "../../components/MultiStepForm";
 
 const Dashborad = () => {
   useLayoutEffect(() => {
     document.title = "Dashborad";
   }, []);
+
   return (
-    <section>
+    <div>
       <h5>Dashborad</h5>
-    </section>
+      {/* <DashboardForm /> */}
+      <div className="form-container">
+        <MultiStepForm />
+      </div>
+    </div>
   );
 };
 

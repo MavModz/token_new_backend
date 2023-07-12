@@ -1,0 +1,33 @@
+.animated-button {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.animated-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: -1;
+  transition: width 0.3s ease-in-out;
+}
+
+.animated-button:hover {
+  background-color: #0056b3;
+}
+
+.animated-button:hover::before {
+  width: 100%;
+}

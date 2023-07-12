@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { register } from "../../Api/api";
+import { registerUser } from "../../Api/userApi";
 import { useToasts } from "react-toast-notifications";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -39,7 +39,7 @@ const Register = () => {
     // Perform the registration logic with the updated user data
     // Reset the form after registration
     setUser({ mobile: "", name: "", DOB: "", email: "" });
-    register(updatedUser)
+    registerUser(updatedUser)
       .then((response) => {
         console.log(response);
         if (response.status === 201) {
@@ -69,7 +69,7 @@ const Register = () => {
       </p>
       <form onSubmit={handleRegister}>
         <input
-          className="form-control"
+          className="form-control_"
           type="text"
           name="name"
           placeholder="Enter Username"
@@ -78,7 +78,7 @@ const Register = () => {
           required
         />
         <input
-          className="form-control"
+          className="form-control_"
           type="email"
           name="email"
           placeholder="Enter Email"
@@ -87,7 +87,7 @@ const Register = () => {
           required
         />
         <input
-          className="form-control"
+          className="form-control_"
           type="text"
           name="DOB"
           placeholder="Enter Date of Birth (DD-MM-YYYY)"
@@ -96,7 +96,7 @@ const Register = () => {
           required
         />
         <input
-          className="form-control"
+          className="form-control_"
           type="text"
           name="number"
           placeholder="Enter Phone Number"
