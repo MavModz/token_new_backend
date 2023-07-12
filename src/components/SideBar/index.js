@@ -81,6 +81,7 @@ import "./index.css";
 import { MdOutlineDashboard, MdOutlinePeopleAlt } from "react-icons/md";
 import { AiOutlineCalendar, AiOutlineMail } from "react-icons/ai";
 import { RiShoppingCartLine, RiChat1Line } from "react-icons/ri";
+import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -141,7 +142,7 @@ const Sidebar = () => {
             <li className="">
               <NavLink
                 to="profileform"
-                onClick={() => handleClick("chat")}
+                onClick={() => handleClick("profileform")}
                 className="sidebar-route"
               >
                 <RiChat1Line
@@ -164,7 +165,7 @@ const Sidebar = () => {
                 onClick={() => handleClick("invoicebalance")}
                 className="sidebar-route"
               >
-                <RiShoppingCartLine
+                <LiaFileInvoiceDollarSolid
                   fontSize={20}
                   className={
                     active === "invoicebalance" ? "isActive" : "inActive"

@@ -39,7 +39,7 @@ const Header = ({ onLogout }) => {
 
   const dispatch = useDispatch();
   const isOpen = useSelector((state) => state.sidebar.isOpen);
-
+  const role = useSelector((state) => state.role);
   const handleToggleSidebar = () => {
     dispatch(toggleSidebar());
   };
@@ -142,7 +142,7 @@ const Header = ({ onLogout }) => {
                 style={{ fontSize: "0.8rem" }}
                 className="d-none d-xl-inline-block ms-1 text-transform"
               >
-                Admin
+                {role.admin === true ? "Admin" : "User"}
               </span>
               <IoIosArrowDown
                 className="d-none ms-1 d-xl-inline-block ms-2"

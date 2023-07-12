@@ -1,0 +1,44 @@
+.form-col > textarea {
+  outline: 0;
+}
+textarea {
+  border: 0px;
+  border-radius: 10px;
+}
+
+.heading {
+  color: white;
+}
+label {
+  color: aliceblue;
+}
+
+/* .form-row-between {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 20px;
+  justify-content: space-around;
+  align-items: flex-end;
+} */
+.center {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  color: white;
+}
+/* .file-input-label {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+} */
+/* .placeholder {
+  display: inline-block;
+  min-height: 1em;
+  vertical-align: middle;
+  cursor: wait;
+} */
+/* .file-input-label .placeholder {
+  color: #999;
+} */
