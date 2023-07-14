@@ -1,87 +1,10 @@
-// import React, { useState } from "react";
-// import "./index.css";
-// import { MdOutlineDashboard } from "react-icons/md";
-// import { AiOutlineCalendar, AiOutlineMail } from "react-icons/ai";
-// import { RiShoppingCartLine, RiChat1Line } from "react-icons/ri";
-// import { Link } from "react-router-dom";
-// const Sidebar = () => {
-//   const [active, setActive] = useState(false);
-//   return (
-//     <div className="vertical-menu">
-//       <div className="h-100 mm-active">
-//         <div className="mm-active">
-//           <ul className="metismenu list-unstyled mm-show mm-active">
-//             <li className="menu-title">Menu</li>
-//             <li className={`${active ? "mm-active" : ""}`}>
-//               <Link
-//                 to=""
-//                 onClick={() => setActive(true)}
-//                 className="sidebar-route"
-//               >
-//                 <MdOutlineDashboard fontSize={20} />
-//                 <span className="badge rounded-pill bg-success float-end"></span>
-//                 <span className="ms-3">Dashboard</span>
-//               </Link>
-//             </li>
-//             <li className={`${active ? "mm-active" : ""}`}>
-//               <Link
-//                 to=""
-//                 onClick={() => setActive(true)}
-//                 className="sidebar-route"
-//               >
-//                 <AiOutlineCalendar fontSize={20} />
-//                 <span className="badge rounded-pill bg-success float-end"></span>
-//                 <span className="ms-3">Calendar</span>
-//               </Link>
-//             </li>
-//             <li className={`${active ? "mm-active" : ""}`}>
-//               <Link
-//                 to=""
-//                 onClick={() => setActive(true)}
-//                 className="sidebar-route"
-//               >
-//                 <RiChat1Line fontSize={20} />
-//                 <span className="badge rounded-pill bg-success float-end"></span>
-//                 <span className="ms-3">Chat</span>
-//               </Link>
-//             </li>
-//             <li className={`${active ? "mm-active" : ""}`}>
-//               <Link
-//                 to=""
-//                 onClick={() => setActive(true)}
-//                 className="sidebar-route"
-//               >
-//                 <RiShoppingCartLine fontSize={20} />
-//                 <span className="badge rounded-pill bg-success float-end"></span>
-//                 <span className="ms-3">Ecommerce</span>
-//               </Link>
-//             </li>
-//             <li className={`${active ? "mm-active" : ""}`}>
-//               <Link
-//                 to=""
-//                 onClick={() => setActive(true)}
-//                 className="sidebar-route"
-//               >
-//                 <AiOutlineMail fontSize={20} />
-//                 <span className="badge rounded-pill bg-success float-end"></span>
-//                 <span className="ms-3">Email</span>
-//               </Link>
-//             </li>
-//           </ul>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Sidebar;
-
 import React, { useState } from "react";
 import "./index.css";
 import { MdOutlineDashboard, MdOutlinePeopleAlt } from "react-icons/md";
-import { AiOutlineCalendar, AiOutlineMail } from "react-icons/ai";
+import { AiOutlineShoppingCart, AiOutlineUsergroupAdd } from "react-icons/ai";
 import { RiShoppingCartLine, RiChat1Line } from "react-icons/ri";
 import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
+import { FaUsers } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -135,7 +58,7 @@ const Sidebar = () => {
                     active === "manageteam" ? "isActive ms-3" : "inActive ms-3"
                   } ${isOpen ? "" : "display-none"}`}
                 >
-                  ManageTeam
+                  Manage Team
                 </span>
               </NavLink>
             </li>
@@ -155,7 +78,7 @@ const Sidebar = () => {
                     active === "profileform" ? "isActive ms-3" : "inActive ms-3"
                   } ${isOpen ? "" : "display-none"}`}
                 >
-                  Profile-Form
+                  Profile Form
                 </span>
               </NavLink>
             </li>
@@ -179,27 +102,67 @@ const Sidebar = () => {
                       : "inActive ms-3"
                   } ${isOpen ? "" : "display-none"}`}
                 >
-                  InvoiceBalance
+                  Invoice Balance
                 </span>
               </NavLink>
             </li>
             <li className="">
               <NavLink
-                to=""
-                onClick={() => handleClick("email")}
+                to="addvendor"
+                onClick={() => handleClick("addvendor")}
                 className="sidebar-route"
               >
-                <AiOutlineMail
+                <AiOutlineUsergroupAdd
                   fontSize={20}
-                  className={active === "email" ? "isActive" : "inActive"}
+                  className={active === "addvendor" ? "isActive" : "inActive"}
                 />
                 <span className="badge rounded-pill bg-success float-end"></span>
                 <span
                   className={`${
-                    active === "email" ? "isActive ms-3" : "inActive ms-3"
+                    active === "addvendor" ? "isActive ms-3" : "inActive ms-3"
                   } ${isOpen ? "" : "display-none"}`}
                 >
-                  Email
+                  Add Vendor
+                </span>
+              </NavLink>
+            </li>
+            <li className="">
+              <NavLink
+                to="vendorslist"
+                onClick={() => handleClick("vendorslist")}
+                className="sidebar-route"
+              >
+                <FaUsers
+                  fontSize={20}
+                  className={active === "vendorslist" ? "isActive" : "inActive"}
+                />
+                <span className="badge rounded-pill bg-success float-end"></span>
+                <span
+                  className={`${
+                    active === "vendorslist" ? "isActive ms-3" : "inActive ms-3"
+                  } ${isOpen ? "" : "display-none"}`}
+                >
+                  Vendor List
+                </span>
+              </NavLink>
+            </li>
+            <li className="">
+              <NavLink
+                to="productlist"
+                onClick={() => handleClick("productlist")}
+                className="sidebar-route"
+              >
+                <AiOutlineShoppingCart
+                  fontSize={20}
+                  className={active === "productlist" ? "isActive" : "inActive"}
+                />
+                <span className="badge rounded-pill bg-success float-end"></span>
+                <span
+                  className={`${
+                    active === "productlist" ? "isActive ms-3" : "inActive ms-3"
+                  } ${isOpen ? "" : "display-none"}`}
+                >
+                  Product List
                 </span>
               </NavLink>
             </li>

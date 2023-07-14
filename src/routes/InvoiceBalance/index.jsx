@@ -8,7 +8,7 @@ const InvoiceBalance = () => {
   const itemsPerPage = 10;
 
   useLayoutEffect(() => {
-    document.title = "Invoice-Balance";
+    document.title = "Invoice Balance";
   }, []);
   // Sample data for the table
   const data = [
@@ -39,14 +39,14 @@ const InvoiceBalance = () => {
 
   return (
     <div className="table-subContainer">
-      <h5>Invoice-Balance</h5>
+      <h5>Invoice Balance</h5>
       <div className="table-container">
         <div className="table-wrapper">
           <table className="tables">
             <thead className="table-head">
               <tr className="head-tr">
                 <th>
-                  <input type="checkbox" id="checkbox" />
+                  <input type="checkbox" className="checkbox" />
                 </th>
                 <th>ID</th>
                 <th>Name</th>
@@ -60,7 +60,7 @@ const InvoiceBalance = () => {
               {currentData.map((row) => (
                 <tr className="body-tr" key={row.id}>
                   <td>
-                    <input type="checkbox" id="checkbox" />
+                    <input type="checkbox" className="checkbox" />
                   </td>
                   <td>{row.id}</td>
                   <td>{row.column1}</td>
