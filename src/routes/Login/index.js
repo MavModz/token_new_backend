@@ -14,7 +14,6 @@ import { useNavigate } from "react-router-dom";
 import { AUTH_TOKEN_KEY } from "../../constant";
 import { useSelector } from "react-redux";
 import { setAuthToken } from "../../redux/reducer/auth";
-import { v4 as uuidv4 } from "uuid";
 import { loginAdmin, loginUser } from "../../redux/reducer/role";
 
 const Login = () => {
@@ -32,7 +31,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authToken = useSelector((state) => state.auth.authToken);
- 
+
   // console.log(role.admin);
   useEffect(() => {
     recaptchaVerifierRef.current = new RecaptchaVerifier(
@@ -106,11 +105,10 @@ const Login = () => {
       });
   };
 
-  const onSignup = async (phoneNumber) => {
-    const formatPh = phoneNumber;
-    const convertedNumber = formatPh.replace("+91", "");
-    dispatch(setFetching(true));
-
+  const onSignup = async (convertedNumber) => {
+    // const formatPh = phoneNumber;
+    // const convertedNumber = formatPh.replace("+91", "");
+    // dispatch(setFetching(true));
     try {
       const response = await checkIfUserExists(convertedNumber);
       console.log(response);
@@ -119,14 +117,13 @@ const Login = () => {
           "Congratulations! You have successfully logged in as a User!",
           {
             appearance: "success",
-            key: uuidv4(), // Generate unique key
           }
         );
         const authToken = response.data.token;
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         dispatch(setAuthToken(authToken)); // Dispatch the action to update the authToken
         dispatch(loginUser(true));
-        dispatch(setFetching(false));
+        // dispatch(setFetching(false));
         if (authToken) {
           navigate("/dashboard");
         }
@@ -134,17 +131,17 @@ const Login = () => {
     } catch (error) {
       addToast("User does not exist in the database", {
         appearance: "error",
-        key: uuidv4(), // Generate unique key
       });
-      sendOTP(phoneNumber);
+      setUser(true);
     }
   };
 
-  const onLogin = async (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-    dispatch(setFetching(true));
+  const onLogin = async (phoneNumber) => {
+    // if (e) {
+    //   e.preventDefault();
+    // }
+    console.log(phoneNumber);
+    // dispatch(setFetching(true));
     const formatPh = phoneNumber;
     const convertedNumber = formatPh.replace("+91", "");
     try {
@@ -153,23 +150,21 @@ const Login = () => {
       if (response.status === 200) {
         addToast("Congratulations! You have successfully logged in as Admin!", {
           appearance: "success",
-          key: uuidv4(), // Generate unique key
         });
         const authToken = response.data.token;
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         dispatch(setAuthToken(authToken)); // Dispatch the action to update the authToken
         dispatch(loginAdmin(true));
-        dispatch(setFetching(false));
+        // dispatch(setFetching(false));
         if (authToken) {
           navigate("/dashboard");
         }
       }
     } catch (error) {
-      addToast("Admin does not exist in the database", {
-        appearance: "error",
-        key: uuidv4(), // Generate unique key
-      });
-      onSignup(phoneNumber);
+      // addToast("Admin does not exist in the database", {
+      //   appearance: "error",
+      // });
+      onSignup(convertedNumber);
     }
   };
 
@@ -188,7 +183,9 @@ const Login = () => {
             });
             dispatch(setFetching(false));
             dispatch(setMobileNumber(phoneNumber));
-            setUser(res.user);
+            console.log(phoneNumber);
+            onLogin(phoneNumber);
+            // setUser(res.user);
           })
           .catch((err) => {
             console.log(err);
@@ -208,7 +205,10 @@ const Login = () => {
 
   const handleSignupClick = (e) => {
     e.preventDefault();
-    onLogin();
+    const formatPh = phoneNumber;
+    // const convertedNumber = formatPh.replace("+91", "");
+    console.log(formatPh);
+    sendOTP(phoneNumber);
   };
 
   return (

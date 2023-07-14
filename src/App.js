@@ -10,6 +10,9 @@ import NotFoundPage from "./routes/NotFoundPage";
 import ManageTeam from "./routes/ManageTeam";
 import ProfileForm from "./routes/ProfileForm";
 import InvoiceBalance from "./routes/InvoiceBalance";
+import AddVendor from "./routes/AddVendor";
+import VendorList from "./routes/VendorList";
+import ProductList from "./routes/ProductList";
 
 function App() {
   const fetching = useSelector((state) => state.fetching);
@@ -30,6 +33,9 @@ function App() {
           <Route path="manageteam" element={<ManageTeam />} />
           <Route path="profileform" element={<ProfileForm />} />
           <Route path="invoicebalance" element={<InvoiceBalance />} />
+          <Route path="addvendor" element={<AddVendor />} />
+          <Route path="vendorslist" element={<VendorList />} />
+          <Route path="productlist" element={<ProductList />} />
         </Route>
         <Route path="login" element={<Login onLogout={handleLogout} />} />
 
