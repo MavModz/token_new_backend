@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
-import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import {
+  AiOutlineLeft,
+  AiOutlineRight,
+  AiOutlineClockCircle,
+} from "react-icons/ai";
 import {
   MdOutlineThumbUpOffAlt,
   MdOutlineThumbDownOffAlt,
@@ -31,11 +35,11 @@ const Table = () => {
   }, []);
 
   const fetchVendors = async () => {
-    const token = localStorage.getItem("auth_token");
+    // const token = localStorage.getItem("auth_token");
     dispatch(setFetching(true));
 
     try {
-      const response = await getAllVendors(token);
+      const response = await getAllVendors();
 
       if (response.status === 200) {
         const data = response.data.vendors;
@@ -58,13 +62,13 @@ const Table = () => {
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleApprove = async (_id) => {
+  const handleApprove = async (id) => {
     const token = localStorage.getItem("auth_token");
-    console.log("Approve", _id);
+    console.log("Approve", id);
     dispatch(setFetching(true));
 
     try {
-      const response = await vendorApprove(_id, token);
+      const response = await vendorApprove(id, token);
       console.log(response);
       if (response.status === 200) {
         console.log(response);
@@ -74,8 +78,10 @@ const Table = () => {
         addToast("Vendors Successfully updated!", {
           appearance: "success",
         });
+        fetchVendors();
       }
     } catch (error) {
+      console.log(error);
       dispatch(setFetching(false));
       addToast("vendor not found!", {
         appearance: "error",
@@ -84,32 +90,32 @@ const Table = () => {
     // Handle the approval logic here
   };
 
-  const handleReject = async (_id) => {
-    console.log("Reject", _id);
-    // Handle the rejection logic here
-    const token = localStorage.getItem("auth_token");
-    dispatch(setFetching(true));
+  // const handleReject = async (_id) => {
+  //   console.log("Reject", _id);
+  //   // Handle the rejection logic here
+  //   const token = localStorage.getItem("auth_token");
+  //   dispatch(setFetching(true));
 
-    try {
-      const response = await vendorReject(_id, token);
-      console.log(response);
-      if (response.status === 200) {
-        console.log(response);
-        // const data = response.data.vendors;
-        // setVendors(data);
-        dispatch(setFetching(false));
-        addToast("Vendors Successfully updated!", {
-          appearance: "success",
-        });
-      }
-    } catch (error) {
-      dispatch(setFetching(false));
-      addToast("vendor not found!", {
-        appearance: "error",
-      });
-    }
-    // Handle the approval logic here
-  };
+  //   try {
+  //     const response = await vendorReject(_id, token);
+  //     console.log(response);
+  //     if (response.status === 200) {
+  //       console.log(response);
+  //       // const data = response.data.vendors;
+  //       // setVendors(data);
+  //       dispatch(setFetching(false));
+  //       addToast("Vendors Successfully updated!", {
+  //         appearance: "success",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     dispatch(setFetching(false));
+  //     addToast("vendor not found!", {
+  //       appearance: "error",
+  //     });
+  //   }
+  //   // Handle the approval logic here
+  // };
 
   const handleDelete = async (_id) => {
     console.log("Delete", _id);
@@ -128,6 +134,7 @@ const Table = () => {
         addToast("Vendors Successfully updated!", {
           appearance: "success",
         });
+        fetchVendors();
       }
     } catch (error) {
       dispatch(setFetching(false));
@@ -170,34 +177,34 @@ const Table = () => {
                   <td>{user.phoneNumber}</td>
                   <td>{user.companyName}</td>
                   <td>
-                    {user.status === "compeleted" ? (
+                    {user.status === "compeleted" && (
                       <span className="status-text-approved">
                         <MdOutlineThumbUpOffAlt />
                         &nbsp;Approved
                       </span>
-                    ) : (
+                    )}
+
+                    {user.status === "pending" && (
                       <span className="status-text-pending">
-                        <BsDot fontSize={20} />
-                        &nbsp;Active
+                        <AiOutlineClockCircle />
+                        &nbsp;Pending
+                      </span>
+                    )}
+                    {user.status === "Reject" && (
+                      <span className="status-text-reject">
+                        <MdOutlineThumbDownOffAlt />
+                        &nbsp;Reject
                       </span>
                     )}
                   </td>
                   <td>
-                    {user.status === "compeleted" ? (
+                    {user.status === "pending" && (
                       <button
                         className="status-button-approved"
                         onClick={() => handleApprove(user._id)}
                       >
                         <MdOutlineThumbUpOffAlt />
                         &nbsp;Approve
-                      </button>
-                    ) : (
-                      <button
-                        className="status-button-pending"
-                        onClick={() => handleReject(user._id)}
-                      >
-                        <MdOutlineThumbDownOffAlt />
-                        &nbsp;Reject
                       </button>
                     )}
                   </td>

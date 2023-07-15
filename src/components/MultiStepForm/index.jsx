@@ -541,7 +541,9 @@
 import React, { useState } from "react";
 import "./index.css";
 import { LuCheckCircle } from "react-icons/lu";
-
+import { addVendor } from "../../Api/adminApi";
+import { useToasts } from "react-toast-notifications";
+import { setFetching } from "../../redux/reducer/fetching";
 const MultiStepForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -589,10 +591,23 @@ const MultiStepForm = () => {
       </div>
     );
   };
-
-  const handleSubmit = (e) => {
+  const { addToast } = useToasts();
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
+
+    try {
+      const response = await addVendor(formData);
+      if (response.status === 201) {
+        addToast("Vendor added Successfully", {
+          appearance: "success",
+        });
+      }
+    } catch (error) {
+      addToast("Vendor added Successfully", {
+        appearance: "error",
+      });
+    }
   };
 
   return (
@@ -600,7 +615,7 @@ const MultiStepForm = () => {
       <div className="table-wrapper">
         <div className="card-body">
           <div className="center">
-            <h4 className="card-title mb-4">Basic pills Wizard</h4>
+            <h4 className="card-title mb-4">Vendor Details</h4>
           </div>
           <div className="twitter-bs-wizard">
             <ul className="twitter-bs-wizard-nav nav nav-pills nav-justified">
@@ -683,14 +698,14 @@ const MultiStepForm = () => {
                   </div>
                   <div className="form-row">
                     <div className="form-col">
-                      <input
+                      {/* <input
                         type="file"
                         id="firstName"
                         name="companyLogo"
                         accept="image/*"
                         onChange={handleFileChange}
                         required
-                      />
+                      /> */}
                       {/* <label htmlFor="companyLogo">Company Logo:</label> */}
                     </div>
                   </div>
@@ -726,14 +741,14 @@ const MultiStepForm = () => {
                   </div>
                   <div className="form-row">
                     <div className="form-col">
-                      <input
+                      {/* <input
                         type="file"
                         id="firstName"
                         name="ownerProfileImage"
                         accept="image/*"
                         onChange={handleFileChange}
                         required
-                      />
+                      /> */}
                       {/* <label htmlFor="ownerProfileImage">
                         Owner Profile Image:
                       </label> */}
@@ -770,14 +785,14 @@ const MultiStepForm = () => {
                   </div>
                   <div className="form-row">
                     <div className="form-col">
-                      <input
+                      {/* <input
                         type="file"
                         id="firstName"
                         name="productImage"
                         accept="image/*"
                         onChange={handleFileChange}
                         required
-                      />
+                      /> */}
                       {/* <label
                         htmlFor="productImage"
                         className="file-input-label"

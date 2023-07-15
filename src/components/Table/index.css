@@ -170,6 +170,18 @@ tbody > tr {
   min-width: 117px;
   color: #4caf50;
 }
+.status-text-pending {
+  display: flex;
+  align-items: center;
+  min-width: 117px;
+  color: rgb(255, 238, 0);
+}
+.status-text-reject {
+  display: flex;
+  align-items: center;
+  min-width: 117px;
+  color: #ff0000;
+}
 
 .status-button-approved {
   display: flex;
@@ -187,14 +199,50 @@ tbody > tr {
 .status-button-approved:hover {
   background-color: #3ad640;
 }
-.status-button-delete {
+
+.status-button-save {
   display: flex;
   align-items: center;
   min-width: 117px;
   padding: 8px 16px;
-  background-color: rgb(223, 20, 20);
-  color: #fff;
-  border: none;
+  background-color: white;
+  color: #3333ff;
+  border: 2px solid #3333ff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.status-button-save:hover {
+  background-color: #3333ff;
+  color: white;
+}
+.status-button-cancel {
+  display: flex;
+  align-items: center;
+  min-width: 117px;
+  padding: 8px 16px;
+  background-color: white;
+  color: black;
+  border: 2px solid rgb(255, 255, 0);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.status-button-cancel:hover {
+  background-color: rgb(255, 255, 0);
+  color: black;
+}
+
+.status-button-delete {
+  display: flex;
+  align-items: center;
+  min-width: 50px;
+  padding: 8px 16px;
+  background-color: white;
+  color: rgb(223, 20, 20);
+  border: 1px solid rgb(223, 20, 20);
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
@@ -202,6 +250,25 @@ tbody > tr {
 
 .status-button-delete:hover {
   background-color: rgb(247, 69, 69);
+  color: white;
+}
+
+.status-edit-delete {
+  display: flex;
+  align-items: center;
+  min-width: 50px;
+  padding: 8px 16px;
+  background-color: white;
+  color: #3333ff;
+  border: 1px solid blue;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.status-edit-delete:hover {
+  background-color: #3333ff;
+  color: white;
 }
 
 .status-button-pending {
@@ -220,6 +287,10 @@ tbody > tr {
   background-color: #ff6600;
 }
 
+.distance-between {
+  display: flex;
+  flex-direction: row;
+}
 /* media query here */
 
 @media (max-height: 720px) {
