@@ -420,12 +420,14 @@ textarea {
 
 @media (min-width: 993px) {
   .website-logo .logo {
-    background-image: url(../../assets/logo-dark.svg);
+    background-image: url(../../assets/header/Ride-Dost-Dark.png);
+    width: 150px;
   }
 }
 @media (max-width: 992px) {
   .website-logo .logo {
-    background-image: url(../../assets/logo-light.svg);
+    background-image: url(../../assets/header/Ride-Dost.png);
+    width: 150px;
   }
 
   .website-logo {
