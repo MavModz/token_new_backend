@@ -6,10 +6,10 @@ import { IoIosArrowDown } from "react-icons/io";
 import { FiSearch } from "react-icons/fi";
 import { RiWallet3Line, RiShutDownLine } from "react-icons/ri";
 import { CgProfile } from "react-icons/cg";
-import LogoDark from "../../assets/header/logo-sm-dark.png";
+import LogoDark from "../../assets/header/Ride-Dost-Small.png";
 import LogoLight from "../../assets/header/logo-sm-light.png";
 import LogoNazoxDark from "../../assets/header/logo-dark.png";
-import LogoNazoxLight from "../../assets/header/logo-light.png";
+import LogoNazoxLight from "../../assets/header/Ride-Dost.png";
 import { Link } from "react-router-dom";
 import { useToasts } from "react-toast-notifications";
 import { useNavigate } from "react-router-dom";
@@ -23,8 +23,6 @@ const Header = ({ onLogout }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // localStorage.removeItem("auth_token");
-
     logout();
   };
 
