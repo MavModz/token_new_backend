@@ -209,7 +209,7 @@ const Login = () => {
     // const convertedNumber = formatPh.replace("+91", "");
     console.log(formatPh);
     sendOTP(phoneNumber);
-    onLogin(phoneNumber);
+    // onLogin(phoneNumber);
   };
 
   return (
