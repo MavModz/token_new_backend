@@ -7,7 +7,7 @@
   z-index: 1000;
   display: inline-block;
   top: 50%;
-  left: 220px;
+  left: 185px;
   right: initial;
   bottom: initial;
 }
@@ -421,7 +421,7 @@ textarea {
 @media (min-width: 993px) {
   .website-logo .logo {
     background-image: url(../../assets/header/Ride-Dost-Dark.png);
-    width: 150px;
+    width: 190px;
   }
 }
 @media (max-width: 992px) {

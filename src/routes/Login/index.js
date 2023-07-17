@@ -217,11 +217,11 @@ const Login = () => {
     <section className="form-body">
       <div className="website-logo">
         <div className="recaptcha-container" id="recaptcha-container"></div>
-        <a href="index.html">
+        <div>
           <div className="logo">
             <img className="logo-size" src={Image} alt="" />
           </div>
-        </a>
+        </div>
       </div>
       <div className="row_">
         <div className="img-holder">
