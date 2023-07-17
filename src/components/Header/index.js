@@ -23,8 +23,6 @@ const Header = ({ onLogout }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // localStorage.removeItem("auth_token");
-
     logout();
   };
 
