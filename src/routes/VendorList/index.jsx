@@ -69,7 +69,7 @@ const VendorList = () => {
     console.log("Delete", id);
     // Handle the delete logic here
   };
-  console.log(vendors);
+  // console.log(vendors);
   return (
     <div className="table-subContainer">
       <h5>Vendors List</h5>
