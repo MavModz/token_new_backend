@@ -7,7 +7,7 @@ const AddVendor = () => {
   return (
     <div>
       <h5> Add Vendor</h5>
-      <div className="table-container">
+      <div className="">
         <MultiStepForm />
       </div>
     </div>

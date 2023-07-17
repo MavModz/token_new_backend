@@ -38,7 +38,6 @@ function App() {
           <Route path="productlist" element={<ProductList />} />
         </Route>
         <Route path="login" element={<Login onLogout={handleLogout} />} />
-
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </ToastProvider>

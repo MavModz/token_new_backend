@@ -75,7 +75,7 @@ const Table = () => {
         // const data = response.data.vendors;
         // setVendors(data);
         dispatch(setFetching(false));
-        addToast("Vendors Successfully updated!", {
+        addToast("Vendors Successfully Approved!", {
           appearance: "success",
         });
         fetchVendors();
@@ -83,7 +83,7 @@ const Table = () => {
     } catch (error) {
       console.log(error);
       dispatch(setFetching(false));
-      addToast("vendor not found!", {
+      addToast("Vendor not found!", {
         appearance: "error",
       });
     }
@@ -131,14 +131,14 @@ const Table = () => {
         // const data = response.data.vendors;
         // setVendors(data);
         dispatch(setFetching(false));
-        addToast("Vendors Successfully updated!", {
+        addToast("Vendors Successfully Deleted!", {
           appearance: "success",
         });
         fetchVendors();
       }
     } catch (error) {
       dispatch(setFetching(false));
-      addToast("vendor not found!", {
+      addToast("Vendor not found!", {
         appearance: "error",
       });
     }
