@@ -132,6 +132,7 @@ const Login = () => {
       addToast("User does not exist in the database", {
         appearance: "error",
       });
+      dispatch(setFetching(false));
       setUser(true);
     }
   };
