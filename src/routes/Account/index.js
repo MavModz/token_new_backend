@@ -22,7 +22,6 @@ const Account = ({ onLogout }) => {
     } else {
       !authToken && navigate("/login", { replace: true });
       if (authToken && !loginToastShown) {
-        // addToast("Login successful!", { appearance: "success" });
         setLoginToastShown(true);
       }
     }

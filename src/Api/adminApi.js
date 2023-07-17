@@ -13,9 +13,9 @@ export const checkIfAdminExists = async (number) => {
 };
 
 //admin register
-export const registerAdmin = async (userData) => {
+export const addVendor = async (userData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/admin/register`, userData, {
+    const response = await axios.post(`${BASE_URL}/admin/add`, userData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -28,8 +28,9 @@ export const registerAdmin = async (userData) => {
 
 // get all vendors
 
-export const getAllVendors = async (token) => {
+export const getAllVendors = async () => {
   // console.warn(token);
+  const token = localStorage.getItem("auth_token");
   try {
     const response = await axios.get(`${BASE_URL}/admin/vendor`, {
       headers: {
@@ -50,11 +51,6 @@ export const adminUpdate = async (id, userData) => {
     const response = await axios.patch(
       `${BASE_URL}/admin/update/${id}`,
       userData
-      // {
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // }
     );
     return response;
   } catch (error) {
@@ -63,24 +59,32 @@ export const adminUpdate = async (id, userData) => {
 };
 
 //to approve vendors
-export const vendorApprove = async (_id, token) => {
-  console.log(_id, "", token);
+export const vendorApprove = async (id, token) => {
+  // const token = localStorage.getItem("auth_token");
+  console.warn(id, "", token);
   try {
-    const response = await axios.patch(`${BASE_URL}/admin/approval/${_id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.patch(
+      `${BASE_URL}/admin/approval/${id}`,
+      null,
+      {
+        headers: {
+          Authorization: `bearer ${token}`,
+        },
+      }
+    );
+    console.warn(response);
     return response;
   } catch (error) {
+    console.warn(error);
     throw error;
   }
 };
 
 //to reject vendors
-export const vendorReject = async (id, token) => {
+export const vendorReject = async (id) => {
+  const token = localStorage.getItem("auth_token");
   try {
-    const response = await axios.patch(`${BASE_URL}/admin/reject/${id}`, {
+    const response = await axios.patch(`${BASE_URL}/admin/reject/${id}`, null, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -94,7 +98,7 @@ export const vendorReject = async (id, token) => {
 //to delete vendors
 export const vendorDelete = async (id, token) => {
   try {
-    const response = await axios.patch(`${BASE_URL}/admin/vendor/${id}`, {
+    const response = await axios.delete(`${BASE_URL}/admin/vendor/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -129,6 +133,58 @@ export const getAllProducts = async (token) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//to  add products
+export const addProducts = async (token, newProduct) => {
+  console.warn(token, "", newProduct);
+  try {
+    const response = await axios.post(`${BASE_URL}/admin/product`, newProduct, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//to delete products
+export const deleteProducts = async (token, id) => {
+  // console.warn(token);
+  try {
+    const response = await axios.delete(
+      `${BASE_URL}/admin/product/delete/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+//to update products
+export const editProducts = async (token, id, editProduct) => {
+  // console.warn(token);
+  try {
+    const response = await axios.patch(
+      `${BASE_URL}/admin/product/update/${id}`,
+      editProduct,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response;
   } catch (error) {
     throw error;

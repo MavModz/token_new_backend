@@ -108,7 +108,7 @@ const Login = () => {
   const onSignup = async (convertedNumber) => {
     // const formatPh = phoneNumber;
     // const convertedNumber = formatPh.replace("+91", "");
-    // dispatch(setFetching(true));
+    dispatch(setFetching(true));
     try {
       const response = await checkIfUserExists(convertedNumber);
       console.log(response);
@@ -123,7 +123,7 @@ const Login = () => {
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         dispatch(setAuthToken(authToken)); // Dispatch the action to update the authToken
         dispatch(loginUser(true));
-        // dispatch(setFetching(false));
+        dispatch(setFetching(false));
         if (authToken) {
           navigate("/dashboard");
         }
@@ -141,7 +141,7 @@ const Login = () => {
     //   e.preventDefault();
     // }
     console.log(phoneNumber);
-    // dispatch(setFetching(true));
+    dispatch(setFetching(true));
     const formatPh = phoneNumber;
     const convertedNumber = formatPh.replace("+91", "");
     try {
@@ -155,7 +155,7 @@ const Login = () => {
         localStorage.setItem(AUTH_TOKEN_KEY, authToken);
         dispatch(setAuthToken(authToken)); // Dispatch the action to update the authToken
         dispatch(loginAdmin(true));
-        // dispatch(setFetching(false));
+        dispatch(setFetching(false));
         if (authToken) {
           navigate("/dashboard");
         }
@@ -209,6 +209,7 @@ const Login = () => {
     // const convertedNumber = formatPh.replace("+91", "");
     console.log(formatPh);
     sendOTP(phoneNumber);
+    onLogin(phoneNumber);
   };
 
   return (
