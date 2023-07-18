@@ -8,6 +8,8 @@ import { BsFillHeartFill } from "react-icons/bs";
 import { FiCalendar } from "react-icons/fi";
 import EarningTable from "../../components/EarningTable";
 import { useSelector } from "react-redux";
+import VendorList from "../../components/vendorList/VendorList.jsx";
+import Coupons from "../../components/coupons/Coupons";
 const Dashborad = () => {
   useLayoutEffect(() => {
     document.title = "Dashborad";
@@ -36,11 +38,6 @@ const Dashborad = () => {
       icon: <FiCalendar />,
       value: "789",
     },
-    {
-      title: "Card 5",
-      icon: <FiCalendar />,
-      value: "789",
-    },
   ];
 
   return (
@@ -50,8 +47,24 @@ const Dashborad = () => {
       {/* <div className="form-container"> */}
       {/* <MultiStepForm /> */}
       <Cards data={data} />
-      {/* </div> */}
-      {/* <EarningTable /> */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "1rem",
+          marginTop: "1rem",
+        }}
+      >
+        <div style={{ border: "1px solid red", width: "50%" }}>
+          All Vendor
+          <VendorList />
+        </div>
+        <div style={{ border: "1px solid red", width: "50%" }}>
+          {" "}
+          All Coupons
+          <Coupons />
+        </div>
+      </div>
     </div>
   );
 };
