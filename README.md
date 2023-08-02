@@ -7,6 +7,9 @@
 ## END POINT..
 
 
+ to see all the list of vendor...
+
+
 method :GET
 
 /admin/vendor
