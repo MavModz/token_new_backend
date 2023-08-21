@@ -44,9 +44,20 @@ admin.post("/login/:mobile", async (req, res) => {
 
 admin.post("/add", loginAuth, async (req, res) => {
   try {
-    const data = req.body;
+    
+    const {
+      name,
+      email,
+      phoneNumber,
+      companyName,
+      companyOwner,
+      comapnyLogo,
+      address,
+      thresholdvalue,
+      id_proof,
+    } = req.body;
 
-    const { phoneNumber } = data;
+  
 
     const isAdmin = await Admin.findOne({ phoneNumber });
     const isUser = await userModel.findOne({ phoneNumber });
@@ -57,13 +68,41 @@ admin.post("/add", loginAuth, async (req, res) => {
         .json({ message: "Already present contact customer care" });
     }
 
-    const adminData = await Admin(data);
-    const response = await adminData.save();
+    if (id_proof && comapnyLogo) {
+      const uploadedIDproof = await cloudinary.uploader.upload(id_proof, {
+        upload_preset: "ridedost",
+        folder: "ridedost",
+      });
+
+      const uploadedLogo = await cloudinary.uploader.upload(logo, {
+        upload_preset: "ridedost",
+        folder: "ridedost",
+      });
+      if (uploadedIDproof && uploadedLogo) {
+        const adminData = new Admin({
+          name,
+          email,
+          phoneNumber,
+          companyName,
+          companyOwner,
+          address,
+          thresholdvalue,
+          id_proof: uploadedIDproof,
+          comapnyLogo: uploadedLogo,
+        });
+
+        const response = await adminData.save();
+      }
+    }
+
     console.log("this is created admin ID", adminData._id);
+
     const { vendorId } = adminData;
 
     const isVendor = await Admin.findOne({ _id: vendorId });
+
     console.log(isVendor);
+
     if (isVendor.role == "vendor") {
       const superAdmin = await Admin.findOne({ role: "admin" });
       const { _id } = superAdmin;
@@ -197,55 +236,49 @@ admin.get("/recieved/request", AdminAithentication, async (req, res) => {
     .json({ message: "here all the pending request..", allRequest });
 });
 
-
-
-admin.post("/forward/:_id", AdminAithentication,async (req, res) => {
+admin.post("/forward/:_id", AdminAithentication, async (req, res) => {
   const { _id } = req.params;
 
-  const forwardRequest = await VendorSettlement.findOne(
-    { _id: _id },
-   
+  const forwardRequest = await VendorSettlement.findOne({ _id: _id });
+
+  forwardRequest.sendor.status = "forwarded";
+  forwardRequest.reciever.status = "pending";
+  forwardRequest.superAdmin.status = "forwarded";
+
+  const isrequested = await VendorSettlement.findByIdAndUpdate(
+    { _id },
+    { ...forwardRequest }
   );
-
-  forwardRequest.sendor.status='forwarded';
-  forwardRequest.reciever.status= 'pending';
-  forwardRequest.superAdmin.status= 'forwarded';
-
-  const isrequested = await VendorSettlement.findByIdAndUpdate({_id}, {...forwardRequest});
-
 
   if (!isrequested) {
     return res.status(500).json({ message: "something went wrong" });
   }
 
-  res.status(200).json({message:"succesfully forwarding to vendor", forwardRequest})
+  res
+    .status(200)
+    .json({ message: "succesfully forwarding to vendor", forwardRequest });
 });
 
+admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
+  const { _id } = req.params;
 
+  const data = await VendorSettlement.findOne({ _id });
 
+  data.superAdmin.status = "returning";
+  data.sendor.status = "requested";
 
-admin.patch('/return/:_id', AdminAithentication, async(req,res)=>{
+  const isUpdate = await VendorSettlement.findByIdAndUpdate(
+    { _id },
+    { ...data }
+  );
 
-const {_id} = req.params;
+  console.log(isUpdate);
 
-const data = await VendorSettlement.findOne({_id})
+  if (!isUpdate) {
+    return res.status(500).json({ message: "something went wrong..." });
+  }
 
-data.superAdmin.status= 'returning';
-data.sendor.status= 'requested';
-
-
-const isUpdate = await VendorSettlement.findByIdAndUpdate({_id}, {...data});
-
-console.log(isUpdate)
-
-if(!isUpdate){
-  return res.status(500).json({message:"something went wrong..."})
-}
-
-
-return res.status(200).json({message:"return to vendor..."})
-
-})
-
+  return res.status(200).json({ message: "return to vendor..." });
+});
 
 module.exports = admin;

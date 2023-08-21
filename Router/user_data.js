@@ -38,7 +38,7 @@ user_Router.post("/login/:mob", async (req, res) => {
 
     var token = jwt.sign({ userId: user._id }, "shhhhh");
 
-    token = token + "2";
+    token = token + "3";
 
     return res.status(200).json({ message: "User already present", token });
   } catch (error) {
