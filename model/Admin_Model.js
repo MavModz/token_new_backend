@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const superAdminSchema = new mongoose.Schema({
-  
   name: {
     type: String,
     required: true,
@@ -37,22 +36,22 @@ const superAdminSchema = new mongoose.Schema({
     type: String,
     default: "pending",
   },
-  companyLogo:{
-    type:Object,
-    required:true
+  companyLogo: {
+    type: Object,
+    required: true,
   },
-  address:{
-    type:String,
-    required:true
+  address: {
+    type: String,
+    required: true,
   },
-  id_proof:{
-    type:Object,
-    required:true
+  id_proof: {
+    type: Object,
+    required: true,
   },
-  thresholdvalue:{
-    type:Number,
-    default:0,
-    required:true
+  thresholdvalue: {
+    type: Number,
+    default: 0,
+    required: true,
   },
   vendorId: { type: String, default: "N/A" },
 });
