@@ -15,11 +15,11 @@ app.use(express.json());
 app.use("/user", user_Router);
 app.use("/admin", admin);
 app.use("/admin/payment", paymentRouter);
-app.use('/admin/validate', Coupon_validate)
-app.use('/admin/product', Product_Router)
-app.use('/admin/coupons', Coupon_validate);
+app.use("/admin/validate", Coupon_validate);
+app.use("/admin/product", Product_Router);
+app.use("/admin/coupons", Coupon_validate);
 
-app.use('/admin/settle',settleMentRoute)
+app.use("/admin/settle", settleMentRoute);
 
 app.listen(4200, async () => {
   console.log("port is listing 4200");

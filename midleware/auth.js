@@ -28,7 +28,7 @@ const AdminAithentication = async (req, res, next) => {
   console.log("this is token", token);
   const decoded = jwt.verify(token, "shhhh");
   const isAdmin = await Admin.findOne({ _id: decoded.userId });
-  if (isAdmin.role == "admin") {
+  if (isAdmin?.role == "admin") {
     req.body.adminId = isAdmin._id;
     next();
     return;
@@ -45,11 +45,11 @@ const loginAuth = async (req, res, next) => {
   const isAdmin = await Admin.findOne({ _id: decoded.userId });
   req.body.vendorId = decoded.userId;
 
-  if (isAdmin.role == "admin") {
+  if (isAdmin?.role == "admin" || isAdmin?.role == "vendor") {
     req.body.status = "completed";
   }
 
-  if (isAdmin.status == "completed") {
+  if (isAdmin?.status == "completed") {
     next();
     return;
   }

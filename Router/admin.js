@@ -30,12 +30,12 @@ admin.post("/login/:mobile", async (req, res) => {
 
   var token = jwt.sign({ userId: _id }, "shhhh");
 
-  if (isAdmin.role === "admin") {
+  if (isAdmin?.role === "admin") {
     token += "1";
     return res.status(200).json({ message: "login succesfully", token });
   }
 
-  if (isAdmin.role === "vendor") {
+  if (isAdmin?.role === "vendor") {
     token = token + "2";
 
     return res.status(200).json({ message: "login succesfully", token });
@@ -97,7 +97,7 @@ admin.patch("/update/:id", Adminauth, async (req, res) => {
   return res.status(200).json({ message: "successFully update data" });
 });
 
-admin.get("/vendor", AdminAithentication, async (req, res) => {
+admin.get("/vendor", loginAuth, async (req, res) => {
   const vendors = await Admin.find();
   if (vendors.length == 0) {
     return res.status(404).json({ message: "data not found" });
@@ -197,55 +197,49 @@ admin.get("/recieved/request", AdminAithentication, async (req, res) => {
     .json({ message: "here all the pending request..", allRequest });
 });
 
-
-
-admin.post("/forward/:_id", AdminAithentication,async (req, res) => {
+admin.post("/forward/:_id", AdminAithentication, async (req, res) => {
   const { _id } = req.params;
 
-  const forwardRequest = await VendorSettlement.findOne(
-    { _id: _id },
-   
+  const forwardRequest = await VendorSettlement.findOne({ _id: _id });
+
+  forwardRequest.sendor.status = "forwarded";
+  forwardRequest.reciever.status = "pending";
+  forwardRequest.superAdmin.status = "forwarded";
+
+  const isrequested = await VendorSettlement.findByIdAndUpdate(
+    { _id },
+    { ...forwardRequest }
   );
-
-  forwardRequest.sendor.status='forwarded';
-  forwardRequest.reciever.status= 'pending';
-  forwardRequest.superAdmin.status= 'forwarded';
-
-  const isrequested = await VendorSettlement.findByIdAndUpdate({_id}, {...forwardRequest});
-
 
   if (!isrequested) {
     return res.status(500).json({ message: "something went wrong" });
   }
 
-  res.status(200).json({message:"succesfully forwarding to vendor", forwardRequest})
+  res
+    .status(200)
+    .json({ message: "succesfully forwarding to vendor", forwardRequest });
 });
 
+admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
+  const { _id } = req.params;
 
+  const data = await VendorSettlement.findOne({ _id });
 
+  data.superAdmin.status = "returning";
+  data.sendor.status = "requested";
 
-admin.patch('/return/:_id', AdminAithentication, async(req,res)=>{
+  const isUpdate = await VendorSettlement.findByIdAndUpdate(
+    { _id },
+    { ...data }
+  );
 
-const {_id} = req.params;
+  console.log(isUpdate);
 
-const data = await VendorSettlement.findOne({_id})
+  if (!isUpdate) {
+    return res.status(500).json({ message: "something went wrong..." });
+  }
 
-data.superAdmin.status= 'returning';
-data.sendor.status= 'requested';
-
-
-const isUpdate = await VendorSettlement.findByIdAndUpdate({_id}, {...data});
-
-console.log(isUpdate)
-
-if(!isUpdate){
-  return res.status(500).json({message:"something went wrong..."})
-}
-
-
-return res.status(200).json({message:"return to vendor..."})
-
-})
-
+  return res.status(200).json({ message: "return to vendor..." });
+});
 
 module.exports = admin;
