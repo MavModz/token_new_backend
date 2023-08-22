@@ -6,7 +6,7 @@ const productModel = require("../model/product");
 const jwt = require("jsonwebtoken");
 const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
-
+const cloudinary=require("./cloudinary")
 const {
   Adminauth,
   AdminAithentication,
@@ -42,11 +42,23 @@ admin.post("/login/:mobile", async (req, res) => {
   }
 });
 
-admin.post("/add", loginAuth, async (req, res) => {
+admin.post("/add",loginAuth,async (req, res) => {
   try {
-    const data = req.body;
+    
+    const {
+      name,
+      email,
+      phoneNumber,
+      companyName,
+      companyOwner,
+      companyLogo,
+      address,
+      thresholdvalue,
+      id_proof,
+      vendorId,
+    } = req.body;
 
-    const { phoneNumber } = data;
+    console.log(req.body)
 
     const isAdmin = await Admin.findOne({ phoneNumber });
     const isUser = await userModel.findOne({ phoneNumber });
@@ -56,14 +68,46 @@ admin.post("/add", loginAuth, async (req, res) => {
         .status(409)
         .json({ message: "Already present contact customer care" });
     }
+    var  adminData 
+    if (id_proof && companyLogo) {
+      const uploadedIDproof = await cloudinary.uploader.upload(id_proof, {
+        upload_preset: "ridedost",
 
-    const adminData = await Admin(data);
-    const response = await adminData.save();
-    console.log("this is created admin ID", adminData._id);
-    const { vendorId } = adminData;
+      });
+
+      const uploadedLogo = await cloudinary.uploader.upload(companyLogo, {
+        upload_preset: "ridedost",
+        folder: "ridedost",
+      });
+     
+   
+      if (uploadedIDproof && uploadedLogo) {
+        adminData = new Admin({
+          name,
+          email,
+          phoneNumber,
+          companyName,
+          companyOwner,
+          address,
+          thresholdvalue,
+          id_proof: uploadedIDproof,
+          companyLogo: uploadedLogo,
+          vendorId
+        });
+        
+       const  response = await adminData.save();
+       console.log("this is created admin ID", adminData._id);
+      }
+    }
+
+ 
+
+    // const { vendorId } = adminData;
 
     const isVendor = await Admin.findOne({ _id: vendorId });
-    console.log(isVendor);
+
+    console.log("vendor",isVendor);
+
     if (isVendor.role == "vendor") {
       const superAdmin = await Admin.findOne({ role: "admin" });
       const { _id } = superAdmin;
@@ -77,6 +121,7 @@ admin.post("/add", loginAuth, async (req, res) => {
     }
 
     res.status(201).json({ message: "succesfully created" });
+    console.log("successful created")
   } catch (err) {
     console.log("error", err);
     return res.status(500).json(err);
@@ -197,55 +242,49 @@ admin.get("/recieved/request", AdminAithentication, async (req, res) => {
     .json({ message: "here all the pending request..", allRequest });
 });
 
-
-
-admin.post("/forward/:_id", AdminAithentication,async (req, res) => {
+admin.post("/forward/:_id", AdminAithentication, async (req, res) => {
   const { _id } = req.params;
 
-  const forwardRequest = await VendorSettlement.findOne(
-    { _id: _id },
-   
+  const forwardRequest = await VendorSettlement.findOne({ _id: _id });
+
+  forwardRequest.sendor.status = "forwarded";
+  forwardRequest.reciever.status = "pending";
+  forwardRequest.superAdmin.status = "forwarded";
+
+  const isrequested = await VendorSettlement.findByIdAndUpdate(
+    { _id },
+    { ...forwardRequest }
   );
-
-  forwardRequest.sendor.status='forwarded';
-  forwardRequest.reciever.status= 'pending';
-  forwardRequest.superAdmin.status= 'forwarded';
-
-  const isrequested = await VendorSettlement.findByIdAndUpdate({_id}, {...forwardRequest});
-
 
   if (!isrequested) {
     return res.status(500).json({ message: "something went wrong" });
   }
 
-  res.status(200).json({message:"succesfully forwarding to vendor", forwardRequest})
+  res
+    .status(200)
+    .json({ message: "succesfully forwarding to vendor", forwardRequest });
 });
 
+admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
+  const { _id } = req.params;
 
+  const data = await VendorSettlement.findOne({ _id });
 
+  data.superAdmin.status = "returning";
+  data.sendor.status = "requested";
 
-admin.patch('/return/:_id', AdminAithentication, async(req,res)=>{
+  const isUpdate = await VendorSettlement.findByIdAndUpdate(
+    { _id },
+    { ...data }
+  );
 
-const {_id} = req.params;
+  console.log(isUpdate);
 
-const data = await VendorSettlement.findOne({_id})
+  if (!isUpdate) {
+    return res.status(500).json({ message: "something went wrong..." });
+  }
 
-data.superAdmin.status= 'returning';
-data.sendor.status= 'requested';
-
-
-const isUpdate = await VendorSettlement.findByIdAndUpdate({_id}, {...data});
-
-console.log(isUpdate)
-
-if(!isUpdate){
-  return res.status(500).json({message:"something went wrong..."})
-}
-
-
-return res.status(200).json({message:"return to vendor..."})
-
-})
-
+  return res.status(200).json({ message: "return to vendor..." });
+});
 
 module.exports = admin;
