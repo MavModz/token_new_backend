@@ -6,7 +6,7 @@ const productModel = require("../model/product");
 const jwt = require("jsonwebtoken");
 const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
-
+const cloudinary=require("./cloudinary")
 const {
   Adminauth,
   AdminAithentication,
@@ -42,7 +42,7 @@ admin.post("/login/:mobile", async (req, res) => {
   }
 });
 
-admin.post("/add", loginAuth, async (req, res) => {
+admin.post("/add",loginAuth,async (req, res) => {
   try {
     
     const {
@@ -51,13 +51,14 @@ admin.post("/add", loginAuth, async (req, res) => {
       phoneNumber,
       companyName,
       companyOwner,
-      comapnyLogo,
+      companyLogo,
       address,
       thresholdvalue,
       id_proof,
+      vendorId,
     } = req.body;
 
-  
+    console.log(req.body)
 
     const isAdmin = await Admin.findOne({ phoneNumber });
     const isUser = await userModel.findOne({ phoneNumber });
@@ -67,19 +68,21 @@ admin.post("/add", loginAuth, async (req, res) => {
         .status(409)
         .json({ message: "Already present contact customer care" });
     }
-
-    if (id_proof && comapnyLogo) {
+    var  adminData 
+    if (id_proof && companyLogo) {
       const uploadedIDproof = await cloudinary.uploader.upload(id_proof, {
         upload_preset: "ridedost",
-        folder: "ridedost",
+
       });
 
-      const uploadedLogo = await cloudinary.uploader.upload(logo, {
+      const uploadedLogo = await cloudinary.uploader.upload(companyLogo, {
         upload_preset: "ridedost",
         folder: "ridedost",
       });
+     
+   
       if (uploadedIDproof && uploadedLogo) {
-        const adminData = new Admin({
+        adminData = new Admin({
           name,
           email,
           phoneNumber,
@@ -88,20 +91,22 @@ admin.post("/add", loginAuth, async (req, res) => {
           address,
           thresholdvalue,
           id_proof: uploadedIDproof,
-          comapnyLogo: uploadedLogo,
+          companyLogo: uploadedLogo,
+          vendorId
         });
-
-        const response = await adminData.save();
+        
+       const  response = await adminData.save();
+       console.log("this is created admin ID", adminData._id);
       }
     }
 
-    console.log("this is created admin ID", adminData._id);
+ 
 
-    const { vendorId } = adminData;
+    // const { vendorId } = adminData;
 
     const isVendor = await Admin.findOne({ _id: vendorId });
 
-    console.log(isVendor);
+    console.log("vendor",isVendor);
 
     if (isVendor.role == "vendor") {
       const superAdmin = await Admin.findOne({ role: "admin" });
@@ -116,6 +121,7 @@ admin.post("/add", loginAuth, async (req, res) => {
     }
 
     res.status(201).json({ message: "succesfully created" });
+    console.log("successful created")
   } catch (err) {
     console.log("error", err);
     return res.status(500).json(err);

@@ -37,7 +37,7 @@ const superAdminSchema = new mongoose.Schema({
     type: String,
     default: "pending",
   },
-  comapnyLogo:{
+  companyLogo:{
     type:Object,
     required:true
   },
