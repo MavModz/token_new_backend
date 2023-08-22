@@ -29,7 +29,7 @@ const superAdminSchema = new mongoose.Schema({
     type: String,
     default: "vendor",
   },
-  cash: {
+  presentageValue: {
     type: Number,
     default: 0,
   },
