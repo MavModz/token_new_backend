@@ -293,8 +293,15 @@ admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
 admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
   const payload = req.body;
   const _id= req.body.vendorId
+  const {profileImage}=req.body
 
-
+  if (profileImage) {
+    const image = await cloudinary.uploader.upload(profileImage, {
+      upload_preset: "ridedost",
+  });
+  req.body.profileImage=image
+ }
+ 
   const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
 
   if (!updateData) {

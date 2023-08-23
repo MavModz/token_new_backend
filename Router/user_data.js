@@ -3,7 +3,7 @@ const { userModel } = require("../model/user_Model.js");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("../midleware/userAuth.js");
 const couponModel = require("../model/coupon.js");
-
+const cloudinary=require("./cloudinary")
 const AdminModel = require("../model/Admin_Model");
 
 const user_Router = express.Router();
@@ -81,6 +81,14 @@ user_Router.patch("/profile/update", userAuth, async (req, res) => {
   const { userId } = req.body;
   const payload = req.body;
 
+  const {profileImage}=req.body
+  
+  if (profileImage) {
+    const image = await cloudinary.uploader.upload(profileImage, {
+      upload_preset: "ridedost",
+  });
+  req.body.profileImage=image
+ }
   const updatedProfile = await userModel.findOneAndUpdate(
     { _id: userId },
     { $set: { ...payload } },
