@@ -77,12 +77,13 @@ user_Router.get("/vendor/list", userAuth, async (req, res) => {
   return res.status(200).json({ message: "here are list of vendor", Admins });
 });
 
+//user profile update
 user_Router.patch("/profile/update", userAuth, async (req, res) => {
   const { userId } = req.body;
   const payload = req.body;
 
   const {profileImage}=req.body
-  
+
   if (profileImage) {
     const image = await cloudinary.uploader.upload(profileImage, {
       upload_preset: "ridedost",
