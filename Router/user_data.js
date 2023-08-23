@@ -83,16 +83,18 @@ user_Router.patch("/profile/update", userAuth, async (req, res) => {
   const payload = req.body;
 
   const {profileImage}=req.body
-
+  // console.log(profileImage)
   if (profileImage) {
     const image = await cloudinary.uploader.upload(profileImage, {
       upload_preset: "ridedost",
   });
+
   req.body.profileImage=image
+ console.log(req.body)
  }
   const updatedProfile = await userModel.findOneAndUpdate(
     { _id: userId },
-    { $set: { ...payload } },
+    { $set: req.body },
     { new: true }
   );
 
@@ -104,6 +106,22 @@ user_Router.patch("/profile/update", userAuth, async (req, res) => {
     .status(200)
     .json({ message: "succesFully updated Profile", updatedProfile });
 });
+
+//get data of single user
+user_Router.get("/personalInfo",userAuth,async(req,res)=>{
+  const _id=  req.body.userId 
+  console.log("id",  req.body.userId )
+  try {
+   const vendorInfo=await userModel.find({_id:_id})
+   return res.status(200).json({ message: "succesfully get the data", vendorInfo });
+  } catch (error) {
+   console.error("Error approving update:", error);
+   return res.status(500).json({ message: "Server error" });
+  }
+ 
+  
+ })
+ 
 
 user_Router.get("/wallet", userAuth, async (req, res) => {
   const { userId } = req.body;
@@ -128,5 +146,7 @@ user_Router.get("/wallet", userAuth, async (req, res) => {
 
   res.send("done");
 });
+
+
 
 module.exports = { user_Router };
