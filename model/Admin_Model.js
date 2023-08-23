@@ -54,14 +54,14 @@ const superAdminSchema = new mongoose.Schema({
     required: true,
   },
   //ADD HERE FOR PERSONAL INFO FILED
-  gender:{
-    type:String,
+  gender: {
+    type: String,
   },
-  DOB:{
-    type:String
+  DOB: {
+    type: String,
   },
-  profileImage:{
-    type:Object
+  profileImage: {
+    type: Object,
   },
   vendorId: { type: String, default: "N/A" },
 });

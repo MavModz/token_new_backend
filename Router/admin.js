@@ -6,7 +6,7 @@ const productModel = require("../model/product");
 const jwt = require("jsonwebtoken");
 const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
-const cloudinary=require("./cloudinary")
+const cloudinary = require("./cloudinary");
 const {
   Adminauth,
   AdminAithentication,
@@ -42,9 +42,8 @@ admin.post("/login/:mobile", async (req, res) => {
   }
 });
 
-admin.post("/add",loginAuth,async (req, res) => {
+admin.post("/add", loginAuth, async (req, res) => {
   try {
-    
     const {
       name,
       email,
@@ -59,7 +58,7 @@ admin.post("/add",loginAuth,async (req, res) => {
       vendorId,
     } = req.body;
 
-    console.log(req.body)
+    console.log(req.body);
 
     const isAdmin = await Admin.findOne({ phoneNumber });
     const isUser = await userModel.findOne({ phoneNumber });
@@ -69,19 +68,17 @@ admin.post("/add",loginAuth,async (req, res) => {
         .status(409)
         .json({ message: "Already present contact customer care" });
     }
-    var  adminData 
+    var adminData;
     if (id_proof && companyLogo) {
       const uploadedIDproof = await cloudinary.uploader.upload(id_proof, {
         upload_preset: "ridedost",
-
       });
 
       const uploadedLogo = await cloudinary.uploader.upload(companyLogo, {
         upload_preset: "ridedost",
         folder: "ridedost",
       });
-     
-   
+
       if (uploadedIDproof && uploadedLogo) {
         adminData = new Admin({
           name,
@@ -94,21 +91,19 @@ admin.post("/add",loginAuth,async (req, res) => {
           thresholdvalue,
           id_proof: uploadedIDproof,
           companyLogo: uploadedLogo,
-          vendorId
+          vendorId,
         });
-        
-       const  response = await adminData.save();
-       console.log("this is created admin ID", adminData._id);
+
+        const response = await adminData.save();
+        console.log("this is created admin ID", adminData._id);
       }
     }
-
- 
 
     // const { vendorId } = adminData;
 
     const isVendor = await Admin.findOne({ _id: vendorId });
 
-    console.log("vendor",isVendor);
+    console.log("vendor", isVendor);
 
     if (isVendor.role == "vendor") {
       const superAdmin = await Admin.findOne({ role: "admin" });
@@ -123,7 +118,7 @@ admin.post("/add",loginAuth,async (req, res) => {
     }
 
     res.status(201).json({ message: "succesfully created" });
-    console.log("successful created")
+    console.log("successful created");
   } catch (err) {
     console.log("error", err);
     return res.status(500).json(err);
@@ -289,20 +284,23 @@ admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
   return res.status(200).json({ message: "return to vendor..." });
 });
 
-
 admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
   const payload = req.body;
-  const _id= req.body.vendorId
-  const {profileImage}=req.body
+  const _id = req.body.vendorId;
+  const { profileImage } = req.body;
 
   if (profileImage) {
     const image = await cloudinary.uploader.upload(profileImage, {
       upload_preset: "ridedost",
-  });
-  req.body.profileImage=image
- }
- 
-  const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
+    });
+    req.body.profileImage = image;
+  }
+
+  const updateData = await Admin.findByIdAndUpdate(
+    _id,
+    { $set: payload },
+    { new: true }
+  );
 
   if (!updateData) {
     return res.status(400).json({ message: "something went wrong" });
@@ -312,21 +310,19 @@ admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
   return res.status(200).json({ message: "successFully update data" });
 });
 
-
 // admin.patch("/pointvalue/update",loginAuth, async (req, res) => {
 //   const payload = req.body;
 //   const _id= req.body.vendorId
 
- 
-  // const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
+// const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
 
-  // if (!updateData) {
-  //   return res.status(400).json({ message: "something went wrong" });
-  // }
+// if (!updateData) {
+//   return res.status(400).json({ message: "something went wrong" });
+// }
 
-  // await updateData.save();
-  // return res.status(200).json({ message: "successFully update data" });
-    
+// await updateData.save();
+// return res.status(200).json({ message: "successFully update data" });
+
 //     const superAdmin = await Admin.findOne({ role: "admin" });
 //     const { id } = superAdmin;
 //     const superAdminID = id.toString();
@@ -336,9 +332,7 @@ admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
 //       "new pointvalue Added",
 //       "Please Approve new pointvalue added"
 //     );
-  
+
 // });
-
-
 
 module.exports = admin;
