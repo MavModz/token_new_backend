@@ -6,6 +6,7 @@ const productModel = require("../model/product");
 const jwt = require("jsonwebtoken");
 const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
+
 const cloudinary=require("./cloudinary")
 const {
   Adminauth,
@@ -290,6 +291,8 @@ admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
 });
 
 
+
+
 admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
   const payload = req.body;
   const _id= req.body.vendorId
@@ -300,11 +303,12 @@ admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
       upload_preset: "ridedost",
   });
   req.body.profileImage=image
+  
  }
  
- console.log(req.body)
-  const updateData = await Admin.findByIdAndUpdate(_id, { $set: req.body}, { new: true });
-
+//  console.log(req.body)
+const updateData = await Admin.findByIdAndUpdate(_id, { $set: req.body}, { new: true });
+console.log(updateData)
   if (!updateData) {
     return res.status(400).json({ message: "something went wrong" });
   }
@@ -315,10 +319,12 @@ admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
 
 //get data of single user
 admin.get("/personalInfo",loginAuth,async(req,res)=>{
+
  const _id= req.body.vendorId
  console.log("id", req.body.vendorId)
  try {
   const vendorInfo=await Admin.find({_id:_id})
+  console.log(_id)
   return res.status(200).json({ message: "succesfully get the data", vendorInfo });
  } catch (error) {
   console.error("Error approving update:", error);
@@ -329,7 +335,12 @@ admin.get("/personalInfo",loginAuth,async(req,res)=>{
 })
 
 
-
-
+admin.post("/checkout",loginAuth,async(req,res)=>{
+  console.log(req.body)
+  const vender_id= req.body.vendorId 
+  const data = await userModel.findOne({ mobile: req.body.phoneNumber });
+  const thresholdvalue = await admin.findOne({ _id: vender_id });
+  console.log(data,thresholdvalue)
+})
 
 module.exports = admin;
