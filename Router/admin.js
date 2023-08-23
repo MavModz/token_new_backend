@@ -302,7 +302,8 @@ admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
   req.body.profileImage=image
  }
  
-  const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
+ console.log(req.body)
+  const updateData = await Admin.findByIdAndUpdate(_id, { $set: req.body}, { new: true });
 
   if (!updateData) {
     return res.status(400).json({ message: "something went wrong" });
@@ -312,32 +313,22 @@ admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
   return res.status(200).json({ message: "successFully update data" });
 });
 
-
-// admin.patch("/pointvalue/update",loginAuth, async (req, res) => {
-//   const payload = req.body;
-//   const _id= req.body.vendorId
+//get data of single user
+admin.get("/personalInfo",loginAuth,async(req,res)=>{
+ const _id= req.body.vendorId
+ console.log("id", req.body.vendorId)
+ try {
+  const vendorInfo=await Admin.find({_id:_id})
+  return res.status(200).json({ message: "succesfully get the data", vendorInfo });
+ } catch (error) {
+  console.error("Error approving update:", error);
+  return res.status(500).json({ message: "Server error" });
+ }
 
  
-  // const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
+})
 
-  // if (!updateData) {
-  //   return res.status(400).json({ message: "something went wrong" });
-  // }
 
-  // await updateData.save();
-  // return res.status(200).json({ message: "successFully update data" });
-    
-//     const superAdmin = await Admin.findOne({ role: "admin" });
-//     const { id } = superAdmin;
-//     const superAdminID = id.toString();
-//     sendNotification(
-//       "success",
-//        superAdminID,
-//       "new pointvalue Added",
-//       "Please Approve new pointvalue added"
-//     );
-  
-// });
 
 
 

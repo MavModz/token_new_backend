@@ -39,12 +39,12 @@ const AdminAithentication = async (req, res, next) => {
 
 const loginAuth = async (req, res, next) => {
   const auth = req.headers.authorization;
-  console.log(auth);
+  // console.log(auth);
   const token = auth?.split(" ")[1];
   const decoded = jwt.verify(token, "shhhh");
-  console.log(decoded.userId)
+  // console.log(decoded.userId)
   const isAdmin = await Admin.findOne({ _id: decoded.userId });
-  console.log(decoded.userId)
+  // console.log(decoded.userId)
   req.body.vendorId = decoded.userId;
 
   if (isAdmin.role == "admin") {
