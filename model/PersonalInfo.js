@@ -12,4 +12,4 @@ const Personal_Info= new mongoose.Schema({
 });
 
 const personalInfoModel = new mongoose.model("personal_Info",Personal_Info);
-module.exports = {personalInfoMode};
+module.exports = {personalInfoModel};

@@ -53,6 +53,16 @@ const superAdminSchema = new mongoose.Schema({
     default: 0,
     required: true,
   },
+  //ADD HERE FOR PERSONAL INFO FILED
+  gender:{
+    type:String,
+  },
+  DOB:{
+    type:String
+  },
+  profileImage:{
+    type:Object
+  },
   vendorId: { type: String, default: "N/A" },
 });
 

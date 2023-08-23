@@ -289,4 +289,56 @@ admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
   return res.status(200).json({ message: "return to vendor..." });
 });
 
+
+admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
+  const payload = req.body;
+  const _id= req.body.vendorId
+  const {profileImage}=req.body
+
+  if (profileImage) {
+    const image = await cloudinary.uploader.upload(profileImage, {
+      upload_preset: "ridedost",
+  });
+  req.body.profileImage=image
+ }
+ 
+  const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
+
+  if (!updateData) {
+    return res.status(400).json({ message: "something went wrong" });
+  }
+
+  await updateData.save();
+  return res.status(200).json({ message: "successFully update data" });
+});
+
+
+// admin.patch("/pointvalue/update",loginAuth, async (req, res) => {
+//   const payload = req.body;
+//   const _id= req.body.vendorId
+
+ 
+  // const updateData = await Admin.findByIdAndUpdate(_id, { $set: payload}, { new: true });
+
+  // if (!updateData) {
+  //   return res.status(400).json({ message: "something went wrong" });
+  // }
+
+  // await updateData.save();
+  // return res.status(200).json({ message: "successFully update data" });
+    
+//     const superAdmin = await Admin.findOne({ role: "admin" });
+//     const { id } = superAdmin;
+//     const superAdminID = id.toString();
+//     sendNotification(
+//       "success",
+//        superAdminID,
+//       "new pointvalue Added",
+//       "Please Approve new pointvalue added"
+//     );
+  
+// });
+
+
+
 module.exports = admin;
