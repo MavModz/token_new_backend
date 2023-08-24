@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const superAdminSchema = new mongoose.Schema({
-  
   name: {
     type: String,
     required: true,
@@ -41,28 +40,32 @@ const superAdminSchema = new mongoose.Schema({
   //   type:Object,
   //   required:true
   // },
-  address:{
-    type:String,
-    required:true
+  address: {
+    type: String,
+    required: true,
   },
-  // id_proof:{
-  //   type:Object,
-  //   required:true
-  // },
-  thresholdvalue:{
-    type:Number,
-    default:0,
-    required:true
+  address: {
+    type: String,
+    required: true,
+  },
+  id_proof: {
+    type: Object,
+    required: true,
+  },
+  thresholdvalue: {
+    type: Number,
+    default: 0,
+    required: true,
   },
   //ADD HERE FOR PERSONAL INFO FILED
-  gender:{
-    type:String,
+  gender: {
+    type: String,
   },
-  DOB:{
-    type:String
+  DOB: {
+    type: String,
   },
-  profileImage:{
-    type:Object
+  profileImage: {
+    type: Object,
   },
   vendorId: { type: String, default: "N/A" },
 });
