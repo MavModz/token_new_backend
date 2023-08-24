@@ -330,4 +330,146 @@ admin.get("/personalInfo", loginAuth, async (req, res) => {
 });
 
 
+
+
+//checkout route
+
+admin.post("/checkout", loginAuth, async (req, res) => {
+  console.log(req.body);
+  const vendor_id = req.body.vendorId;
+  const data = await userModel.find({ mobile: req.body.phoneNumber });
+  console.log(data)
+  const thresholdvalue = await Admin.find({ _id: vendor_id });
+  var discount = 0; // Initialize discount with 0
+  let coupon
+  try {
+    if (data && data.length > 0) {
+      console.log(thresholdvalue[0].thresholdvalue);
+   
+      if(thresholdvalue && thresholdvalue.length > 0 && req.body.coupon){
+        const couponValid=await CouponModel.find({couponCode:req.body.coupon})
+        let valid= checkCouponValidity(couponValid[0].expirationDate)
+        if(valid && couponValid[0].status=="valid"){
+          req.body.amount=req.body.amount-couponValid[0].price
+          console.log(req.body.amount)
+           const updateData={
+            status:"redeem",
+            redeem:{
+              vendorId:vendor_id ,
+              useDate:getCurrentDateFormatted(),
+            }
+           }
+
+           const updatedCoupon = await CouponModel.findByIdAndUpdate(couponValid[0]._id, updateData, {
+            new: true,  // Return the updated document after the update
+            runValidators: true  // Run Mongoose validation on the update
+           });
+          console.log("updatecopupon",updatedCoupon)
+          console.log("thresholdvalue",thresholdvalue[0].thresholdvalue)
+          console.log("amount",req.body.amount)
+
+          if(req.body.amount>=thresholdvalue[0].thresholdvalue){
+            console.log("yess")
+            discount = thresholdvalue[0].thresholdvalue * (thresholdvalue[0].presentageValue / 100);
+            coupon=await new CouponModel({
+            point:discount,
+            userID:data[0]._id,
+            expirationDate: getFormattedDateSixMonthsLater(),
+            status:"valid",
+            couponCode:coponCode.generate(),
+            generate:{
+              vendorId:vendor_id 
+            },
+            price:discount,
+            userName:data[0].name
+          })
+          await coupon.save()
+          return res.status(200).json(`${data[0].name} congrats, you collected ${discount} points from the payment of ${thresholdvalue[0].companyName} and your payment is done  of  ${req.body.amount} rupees`);
+          }
+          return res.status(200).json(`${data[0].name} your payment is done  of  ${req.body.amount} rupees`);
+          
+        }else{
+          res.status(404).json({ message: 'Coupon not found' });
+        }
+
+        const info = new checkoutModel(req.body);
+        const response = await info.save();
+        
+      }
+
+      else if (thresholdvalue && thresholdvalue.length > 0 && thresholdvalue[0].thresholdvalue <= req.body.amount) {
+        discount = thresholdvalue[0].thresholdvalue * (thresholdvalue[0].presentageValue / 100);
+        coupon=await new CouponModel({
+        point:discount,
+        userID:data[0]._id,
+        expirationDate: getFormattedDateSixMonthsLater(),
+        status:"valid",
+        couponCode:coponCode.generate(),
+        generate:{
+          vendorId:vendor_id 
+        },
+        price:discount,
+        userName:data[0].name
+      })
+
+      await coupon.save()
+
+      const info = new checkoutModel(req.body);
+      const response = await info.save();
+      return res.status(200).json(`${data[0].name} congrats, you collected ${discount} points from the payment of ${thresholdvalue[0].companyName} and your payment is done  of  ${req.body.amount} rupees`);
+
+      }
+
+      else {
+        const info = new checkoutModel(req.body);
+        const response = await info.save();
+        return res.status(200).json(`${data[0].name} your payment is done  of  ${req.body.amount} rupees`);
+      }
+
+    } else {
+      return res.status(400).json({ message: "Mobile number is not registered." });
+    }
+
+} catch (error) {
+    console.log("Error:", error);
+    return res.status(500).json({ error: "An error occurred." });
+  }
+})
+
+
+function getFormattedDateSixMonthsLater() {
+  const currentDate = new Date();
+  const sixMonthsLater = new Date(currentDate);
+  sixMonthsLater.setMonth(currentDate.getMonth() + 6);
+
+  const year = sixMonthsLater.getFullYear();
+  const month = (sixMonthsLater.getMonth() + 1).toString().padStart(2, "0");
+  const day = sixMonthsLater.getDate().toString().padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+function getCurrentDateFormatted() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+
+  const formattedDate = `${year}-${month}-${day}`;
+  return formattedDate;
+}
+
+function checkCouponValidity(expirationDate) {
+  const currentDate = new Date();
+  const expirationDateObj = new Date(expirationDate);
+
+  if (currentDate <= expirationDateObj) {
+      return true;
+  } else {
+      return false;
+  }
+}
+
+
 module.exports = admin;
