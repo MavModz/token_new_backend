@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
 const cloudinary = require("./cloudinary");
+
+const cloudinary = require("./cloudinary");
 const {
   Adminauth,
   AdminAithentication,
@@ -17,6 +19,7 @@ const { adminAuth } = require("../midleware/adminAuth");
 const { paymentModel } = require("../model/Payment");
 const CouponModel = require("../model/coupon");
 const coponCode = require("coupon-code");
+const checkoutModel = require("../model/checkout_Model");
 
 admin.post("/login/:mobile", async (req, res) => {
   const { mobile } = req.params;
@@ -296,7 +299,7 @@ admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
     req.body.profileImage = image;
   }
 
-  // console.log(req.body);
+  console.log(req.body);
   const updateData = await Admin.findByIdAndUpdate(
     _id,
     { $set: req.body },

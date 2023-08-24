@@ -36,8 +36,12 @@ const superAdminSchema = new mongoose.Schema({
     type: String,
     default: "pending",
   },
-  companyLogo: {
-    type: Object,
+  // companyLogo:{
+  //   type:Object,
+  //   required:true
+  // },
+  address: {
+    type: String,
     required: true,
   },
   address: {
