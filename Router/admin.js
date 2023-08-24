@@ -331,41 +331,11 @@ admin.get("/personalInfo", loginAuth, async (req, res) => {
 });
 
 
+
+
+
+
 admin.post("/checkout", loginAuth, async (req, res) => {
-  console.log(req.body);
-  const vendor_id = req.body.vendorId;
-  const data = await userModel.find({ mobile: req.body.phoneNumber });
-  const thresholdvalue = await Admin.find({ _id: vendor_id });
-  var discount = 0; // Initialize discount with 0
-
-  try {
-    if (data && data.length > 0) {
-      console.log(thresholdvalue[0].thresholdvalue);
-      if (thresholdvalue && thresholdvalue.length > 0 && thresholdvalue[0].thresholdvalue < req.body.amount) {
-        discount = thresholdvalue[0].thresholdvalue * (thresholdvalue[0].presentageValue / 100);
-        req.body.amount -= discount; // Apply discount to the amount
-        req.body.coupon = coponCode.generate();
-        console.log("Discount applied.");
-      } else {
-        console.log("Threshold condition not met.");
-      }
-    } else {
-      return res.status(400).json({ message: "Mobile number is not registered." });
-    }
-
-    console.log(req.body);
-    const info = new checkoutModel(req.body);
-    const response = await info.save();
-    return res.status(200).json({ response, discount }); // Return the amount and discount
-  } catch (error) {
-    console.log("Error:", error);
-    return res.status(500).json({ error: "An error occurred." });
-  }
-})
-
-
-
-admin.post("/check", loginAuth, async (req, res) => {
   console.log(req.body);
   const vendor_id = req.body.vendorId;
   const data = await userModel.find({ mobile: req.body.phoneNumber });
