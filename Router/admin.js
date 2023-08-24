@@ -329,4 +329,5 @@ admin.get("/personalInfo", loginAuth, async (req, res) => {
   }
 });
 
+
 module.exports = admin;
