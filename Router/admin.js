@@ -333,7 +333,7 @@ admin.get("/personalInfo", loginAuth, async (req, res) => {
 
 
 
-//checkout route
+//checkout route for vendor
 
 admin.post("/checkout", loginAuth, async (req, res) => {
   console.log(req.body);
