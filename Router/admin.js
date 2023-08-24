@@ -8,7 +8,7 @@ const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
 const cloudinary = require("./cloudinary");
 
-const cloudinary = require("./cloudinary");
+
 const {
   Adminauth,
   AdminAithentication,
