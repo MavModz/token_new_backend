@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
 const cloudinary = require("./cloudinary");
-
+const requestModel=require("../model/request")
 const {
   Adminauth,
   AdminAithentication,
@@ -337,7 +337,11 @@ admin.post("/checkout", loginAuth, async (req, res) => {
   
   const vendor_id = req.body.vendorId;
   const data = await userModel.find({mobile: req.body.phoneNumber });
-  console.log(data)
+  const admin= await Admin.find({ role:"admin"});
+  console.log("admin",admin[0]._id.toString())
+
+
+
   const thresholdvalue = await Admin.find({ _id: vendor_id });
   var discount = 0; // Initialize discount with 0
   let coupon
@@ -347,6 +351,10 @@ admin.post("/checkout", loginAuth, async (req, res) => {
    
       if(thresholdvalue && thresholdvalue.length > 0 && req.body.coupon){
         const couponValid=await CouponModel.find({couponCode:req.body.coupon})
+        console.log(couponValid[0].generate.vendorId)
+
+        const generateCopoun=await Admin.find({_id:couponValid[0].generate.vendorId})
+        console.log(generateCopoun[0].name,"name")
         let valid= checkCouponValidity(couponValid[0].expirationDate)
         if(valid && couponValid[0].status=="valid"){
           req.body.amount=req.body.amount-couponValid[0].price
@@ -363,6 +371,39 @@ admin.post("/checkout", loginAuth, async (req, res) => {
             new: true,  // Return the updated document after the update
             runValidators: true  // Run Mongoose validation on the update
            });
+           console.log("updated",updatedCoupon)
+           const sendRequest=new VendorSettlement({
+            sendor:{
+              vendorId:vendor_id,
+              vendorName:thresholdvalue[0].name,
+              Date:getCurrentDateFormatted()
+            },
+            
+            superAdmin: {
+              adminId: admin[0]._id.toString(),
+             
+              status: "pending"
+              
+            },
+            receiver: {
+              vendorId:couponValid[0].generate.vendorId,
+              vendorName:generateCopoun[0].name,
+              status: "pending"
+          
+            },
+            amount:updatedCoupon.price,
+        
+            CouponValue:updatedCoupon.point,
+            coupon:{
+              couponCode:updatedCoupon.couponCode
+            },
+        
+            user:{
+              name: data[0].name,
+              userId: data[0]._id.toString(),
+            }
+        })
+           await sendRequest.save()
           console.log("updatecopupon",updatedCoupon)
           console.log("thresholdvalue",thresholdvalue[0].thresholdvalue)
        
