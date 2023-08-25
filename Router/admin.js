@@ -335,9 +335,9 @@ admin.get("/personalInfo", loginAuth, async (req, res) => {
 //checkout route
 
 admin.post("/checkout", loginAuth, async (req, res) => {
-  console.log(req.body);
+  
   const vendor_id = req.body.vendorId;
-  const data = await userModel.find({ mobile: req.body.phoneNumber });
+  const data = await userModel.find({mobile: req.body.phoneNumber });
   console.log(data)
   const thresholdvalue = await Admin.find({ _id: vendor_id });
   var discount = 0; // Initialize discount with 0
@@ -366,6 +366,7 @@ admin.post("/checkout", loginAuth, async (req, res) => {
            });
           console.log("updatecopupon",updatedCoupon)
           console.log("thresholdvalue",thresholdvalue[0].thresholdvalue)
+       
           console.log("amount",req.body.amount)
 
           if(req.body.amount>=thresholdvalue[0].thresholdvalue){
@@ -383,17 +384,19 @@ admin.post("/checkout", loginAuth, async (req, res) => {
             price:discount,
             userName:data[0].name
           })
+         
           await coupon.save()
-          return res.status(200).json(`${data[0].name} congrats, you collected ${discount} points from the payment of ${thresholdvalue[0].companyName} and your payment is done  of  ${req.body.amount} rupees`);
+          // return res.status(200).json(`${data[0].name} congrats, you collected ${discount} points from the payment of ${thresholdvalue[0].companyName} and your payment is done  of  ${req.body.amount} rupees`);
           }
+          const info = new checkoutModel(req.body);
+          const response = await info.save();
           return res.status(200).json(`${data[0].name} your payment is done  of  ${req.body.amount} rupees`);
           
         }else{
           res.status(404).json({ message: 'Coupon not found' });
         }
 
-        const info = new checkoutModel(req.body);
-        const response = await info.save();
+        
         
       }
 
