@@ -18,9 +18,9 @@ settleMentRoute.get("/coupon/:TovendorId", loginAuth, async (req, res) => {
     "sendor.vendorId": usageVendor,
     "receiver.vendorId": generatedVendor,
   });
-  
+
  const request= coupons.filter((e)=>{
-     return e.superAdmin. status!=="accepted"
+     return e.superAdmin. status!=="returning"
   })
 
  console.log(coupons)
@@ -173,8 +173,6 @@ settleMentRoute.patch("/final/accept/:_id", loginAuth, async (req, res) => {
 
   res.status(200).json({ message: "succesfully accepted" });
 });
-
-
 
 settleMentRoute.patch("/final/rejected/:_id", loginAuth, async (req, res) => {
   const data = await VendorSettlement.findOne({ _id });
