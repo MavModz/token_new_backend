@@ -19,6 +19,7 @@ const { paymentModel } = require("../model/Payment");
 const CouponModel = require("../model/coupon");
 const coponCode = require("coupon-code");
 const checkoutModel = require("../model/checkout_Model");
+const PaymentSettlement = require("../model/paymentSettle");
 
 admin.post("/login/:mobile", async (req, res) => {
   const { mobile } = req.params;
@@ -245,9 +246,9 @@ admin.post("/forward/:_id", AdminAithentication, async (req, res) => {
   const { _id } = req.params;
 
   const forwardRequest = await VendorSettlement.findOne({ _id: _id });
-
+console.log(forwardRequest)
   forwardRequest.sendor.status = "forwarded";
-  forwardRequest.reciever.status = "pending";
+  forwardRequest.receiver.status = "pending";
   forwardRequest.superAdmin.status = "forwarded";
 
   const isrequested = await VendorSettlement.findByIdAndUpdate(
@@ -478,6 +479,179 @@ admin.post("/checkout", loginAuth, async (req, res) => {
     return res.status(500).json({ error: "An error occurred." });
   }
 })
+
+
+// admin request request
+admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
+  const _id = req.body.adminId.toString();
+
+  // const allRequest = await VendorSettlement.find({"superAdmin.adminId": _id,"sendor.status":"requested", });
+  const allRequest = await VendorSettlement.find({
+    "superAdmin.adminId": _id,
+    $or: [
+      { "sendor.status": "requested" },
+      { "receiver.status": "accepted"},
+      { "receiver.status": "rejected" }
+    ]
+  });
+
+  console.log(allRequest);
+
+
+
+  if (allRequest.length == 0 || !allRequest) {
+    return res
+      .status(404)
+      .json({ message: "no incoming settlement avavilable.." });
+  }
+
+
+  res
+    .status(200)
+    .json({ message: "here all the pending request..", allRequest });
+});
+
+
+//vendor recieved request
+admin.get("/vendor/recieved/request",loginAuth, async (req, res) => {
+  const _id = req.body.vendorId;
+  console.log("id",_id)
+  const allRequest = await VendorSettlement.find({"receiver.vendorId":_id, $or: [
+    {"superAdmin.status": "returning"},
+    {"superAdmin.status":"forwarded"},
+    {"sendor.status":"forwarded",},
+    {"sendor.status":"requested",}
+    
+  ] });
+
+
+  console.log(allRequest);
+
+  if (allRequest.length == 0 || !allRequest) {
+    return res
+      .status(404)
+      .json({ message: "no incoming settlement avavilable.." });
+  }
+
+  res
+    .status(200)
+    .json({ message: "here all the pending request..", allRequest });
+});
+
+admin.patch("/vendor/recieved/request/accept/:_id",loginAuth, async (req, res) => {
+  const { _id } = req.params;
+
+  const data = await VendorSettlement.findOne({ _id });
+
+  if (data.superAdmin.status == "accepted") {
+    return res.status(409).json({ message: "already accepeted" });
+  }
+
+  if(data.superAdmin.status=="returning" && data.sendor.status=="requested"){
+       data.superAdmin.status="accepted"
+       data.sendor.status="accepted"
+       data.receiver.status="accepted"
+
+       const paymentsettlemen=new PaymentSettlement({
+        requestedBy:{
+          vendorId:data.sendor.vendorId,
+          vendorName:data.sendor.vendorName
+        },
+        requestedTo:{
+          vendorId:data. receiver.vendorId,
+          vendorName:data. receiver.vendorName
+        },
+        amount:data.amount,
+        AprovedDate:Date.now(),
+        coupon:{
+          couponCode:data.coupon.couponCode,
+          CouponValue:data. CouponValue
+        },
+        user:{
+          name:data.user.name,
+          userId:data.user. userId
+        }
+      });
+
+
+      
+     const isUpdate = await VendorSettlement.findOneAndUpdate(
+       { _id },
+       { ...data }
+     );
+      const response = await paymentsettlemen.save();
+      return res.status(409).json({ message: " accepeted" ,response});
+  }
+
+  data.superAdmin.status ="requestedback";
+  data.receiver.status = "accepted";
+
+  const isUpdate = await VendorSettlement.findOneAndUpdate(
+    { _id },
+    { ...data }
+  );
+
+  if (!isUpdate) {
+    return res.status(500).json({ message: "something went wrong..." });
+  }
+
+  return res.status(200).json({ message: "succesfully accepeted" });
+});
+
+
+
+admin.patch("/vendor/recieved/request/rejected/:_id",loginAuth, async (req, res) => {
+  const { _id } = req.params;
+
+  const data = await VendorSettlement.findOne({ _id });
+
+  if (data.superAdmin.status == "rejected") {
+    return res.status(409).json({ message: "already rejected" });
+  }
+
+  data.sender.status="rejected"
+  data.superAdmin.status = "rejected";
+  data.reciever.status = "rejected";
+
+  const isUpdate = await VendorSettlement.findOneAndUpdate(
+    { _id },
+    { ...data }
+  );
+
+  if (!isUpdate) {
+    return res.status(500).json({ message: "something went wrong..." });
+  }
+
+  return res.status(200).json({ message: "succesfully rejected" });
+});
+
+
+
+// admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
+//   const { _id } = req.params;
+
+//   const data = await VendorSettlement.findOne({ _id });
+
+//   data.superAdmin.status ="accepted";
+//   data.sendor.status = "requested";
+
+//   const isUpdate = await VendorSettlement.findByIdAndUpdate(
+//     { _id },
+//     { ...data }
+//   );
+
+//   console.log(isUpdate);
+
+//   if (!isUpdate) {
+//     return res.status(500).json({ message: "something went wrong..." });
+//   }
+
+//   return res.status(200).json({ message: "return to vendor..." });
+// });
+
+
+
+
 
 
 function getFormattedDateSixMonthsLater() {
