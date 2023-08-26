@@ -247,7 +247,7 @@ admin.post("/forward/:_id", AdminAithentication, async (req, res) => {
 
   const forwardRequest = await VendorSettlement.findOne({ _id: _id });
 console.log(forwardRequest)
-  forwardRequest.sendor.status = "forwarded";
+  // forwardRequest.sendor.status = "forwarded";
   forwardRequest.receiver.status = "pending";
   forwardRequest.superAdmin.status = "forwarded";
 
@@ -270,7 +270,7 @@ admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
 
   const data = await VendorSettlement.findOne({ _id });
 
-  data.superAdmin.status = "returning";
+  data.superAdmin.status ="returning";
   data.sendor.status = "requested";
 
   const isUpdate = await VendorSettlement.findByIdAndUpdate(
@@ -519,7 +519,7 @@ admin.get("/vendor/recieved/request",loginAuth, async (req, res) => {
   const allRequest = await VendorSettlement.find({"receiver.vendorId":_id, $or: [
     {"superAdmin.status": "returning"},
     {"superAdmin.status":"forwarded"},
-    {"sendor.status":"forwarded",},
+    // {"sendor.status":"forwarded",},
     {"sendor.status":"requested",}
     
   ] });
