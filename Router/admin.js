@@ -517,14 +517,18 @@ admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
 admin.get("/vendor/recieved/request",loginAuth, async (req, res) => {
   const _id = req.body.vendorId;
   console.log("id",_id)
-  const allRequest = await VendorSettlement.find({"receiver.vendorId":_id, $or: [
-    // {"superAdmin.status": "returning"},
-    {"superAdmin.status":"forwarded"},
-    // {"sendor.status":"forwarded",},
-    // {"sendor.status":"requested",},
-    { $and: [  {"sendor.status":"pending"},{"reciever.status":"accepted"},{"superAdmin.status":"returning"}] },
+  const allRequest = await VendorSettlement.find({"sendor.vendorId":_id, 
+  $or: [
+  //   // {"superAdmin.status": "returning"},
+  //   // {"superAdmin.status":"forwarded"},
+  //   // {"sendor.status":"forwarded",},
+  //   {"receiver.status":"accepted"},
+  //   {"sendor.status":"pending"},
+    { $and: [  {"sendor.status":"pending"},{"receiver.status":"accepted"},{"superAdmin.status":"returning"}] },
+    { $and: [  {"sendor.status":"pending"},{"receiver.status":"pending"},{"superAdmin.status":"accepted"}] },
     
-  ] });
+  ]
+});
 
 
   console.log(allRequest);
@@ -584,10 +588,10 @@ admin.patch("/vendor/recieved/request/accept/:_id",loginAuth, async (req, res) =
       const response = await paymentsettlemen.save();
       return res.status(409).json({ message: " accepeted" ,response});
   }
- 
-  if(data.sender.status=="requested" && data.receiver.status=="pending" && data.superAdmin.status=="pending"){
-    data.sendor.status=="pending"
-    data.superAdmin.status=="accepted"
+
+  if(data.sendor.status=="requested" && data.receiver.status=="pending" && data.superAdmin.status=="pending"){
+    data.sendor.status="pending"
+    data.superAdmin.status="accepted"
     const isUpdate = await VendorSettlement.findOneAndUpdate(
       { _id },
       { ...data }
