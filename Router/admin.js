@@ -549,7 +549,7 @@ admin.patch("/vendor/recieved/request/accept/:_id",loginAuth, async (req, res) =
     return res.status(409).json({ message: "already accepeted" });
   }
 
-  if(data.superAdmin.status=="returning" && data.sendor.status=="requested"){
+  if((data.superAdmin.status=="returning" && data.sendor.status=="pending") ||( data.sendor.status=="pending" && data.superAdmin.status=="accepted" && data.receiver.status=="pending" )){
        data.superAdmin.status="accepted"
        data.sendor.status="accepted"
        data.receiver.status="accepted"
@@ -583,6 +583,16 @@ admin.patch("/vendor/recieved/request/accept/:_id",loginAuth, async (req, res) =
      );
       const response = await paymentsettlemen.save();
       return res.status(409).json({ message: " accepeted" ,response});
+  }
+ 
+  if(data.sender.status=="requested" && data.reciever.status=="pending"){
+    data.sendor.status=="pending"
+    data.superAdmin.status=="accepted"
+    const isUpdate = await VendorSettlement.findOneAndUpdate(
+      { _id },
+      { ...data }
+    );
+    return res.status(200).json({ message: "succesfully accepeted" });
   }
 
   data.superAdmin.status ="requestedback";
