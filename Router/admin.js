@@ -490,13 +490,17 @@ admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
   const allRequest = await VendorSettlement.find({
     "superAdmin.adminId": _id,
     $or: [
-      { "sendor.status": "requested" },
-      { "receiver.status": "accepted"},
-      { "receiver.status": "rejected" }
+      // { "sendor.status": "requested" },
+      // { "receiver.status": "accepted"},
+      // { "receiver.status": "rejected" },
+      { $and: [  {"sendor.status":"requested"},{"receiver.status":"pending"},{"superAdmin.status":"pending"},] },
+      { $and: [  {"sendor.status":"requested"},{"receiver.status":"accepted"},{"superAdmin.status":"forwarded"}] },
+      { $and: [  {"sendor.status":"requested"},{"receiver.status":"accepted"},{"superAdmin.status":"requestedback"}] },
+    
     ]
   });
 
-  console.log(allRequest);
+  console.log(allRequest.length);
 
 
 
@@ -549,7 +553,7 @@ admin.patch("/vendor/recieved/request/accept/:_id",loginAuth, async (req, res) =
 
   const data = await VendorSettlement.findOne({ _id });
 
-  if (data.superAdmin.status == "accepted") {
+  if (data.superAdmin.status == "accepted" && data.receiver.status=="accepted") {
     return res.status(409).json({ message: "already accepeted" });
   }
 

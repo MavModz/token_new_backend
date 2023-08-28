@@ -20,7 +20,7 @@ settleMentRoute.get("/coupon/:TovendorId", loginAuth, async (req, res) => {
   });
 
  const request= coupons.filter((e)=>{
-     return e.superAdmin. status!=="returning" 
+     return e.superAdmin. status!=="returning" && e.superAdmin.status!=="accepted" && e.sendor.status!=="accepted" && e.receiver.status!=="accepted" 
   })
 
   console.log(request)
