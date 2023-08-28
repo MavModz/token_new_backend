@@ -521,13 +521,15 @@ admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
 admin.get("/vendor/recieved/request",loginAuth, async (req, res) => {
   const _id = req.body.vendorId;
   console.log("id",_id)
-  const allRequest = await VendorSettlement.find({"sendor.vendorId":_id, 
+  const allRequest = await VendorSettlement.find({"receiver.vendorId":_id, 
   $or: [
-  //   // {"superAdmin.status": "returning"},
+    // {"superAdmin.status": "returning"},
   //   // {"superAdmin.status":"forwarded"},
   //   // {"sendor.status":"forwarded",},
   //   {"receiver.status":"accepted"},
   //   {"sendor.status":"pending"},
+    { $and: [  {"sendor.status":"requested"},{"receiver.status":"pending"},{"superAdmin.status":"forwarded"}] },
+    { $and: [  {"sendor.status":"requested"},{"receiver.status":"pending"},{"superAdmin.status":"accepted"}] },
     { $and: [  {"sendor.status":"pending"},{"receiver.status":"accepted"},{"superAdmin.status":"returning"}] },
     { $and: [  {"sendor.status":"pending"},{"receiver.status":"pending"},{"superAdmin.status":"accepted"}] },
     
