@@ -554,6 +554,7 @@ admin.get("/vendor/recieved/request",loginAuth, async (req, res) => {
 admin.get("/vendor/recieved/request/accepted",loginAuth, async (req, res) => {
   const _id = req.body.vendorId;
   console.log("id",_id)
+  
   const allRequest = await VendorSettlement.find({"receiver.vendorId":_id, 
   $or: [
     // {"superAdmin.status": "returning"},
