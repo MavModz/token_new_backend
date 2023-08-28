@@ -20,9 +20,10 @@ settleMentRoute.get("/coupon/:TovendorId", loginAuth, async (req, res) => {
   });
 
  const request= coupons.filter((e)=>{
-     return e.superAdmin. status!=="returning"
+     return e.superAdmin. status!=="returning" 
   })
 
+  console.log(request)
  console.log(coupons)
   if (coupons.length == 0 || !coupons) {
     return res.status(404).json({ message: "no coupon present" });

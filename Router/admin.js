@@ -271,7 +271,8 @@ admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
   const data = await VendorSettlement.findOne({ _id });
 
   data.superAdmin.status ="returning";
-  data.sendor.status = "requested";
+  // data.sendor.status = "requested";
+  data.sendor.status = "pending";
 
   const isUpdate = await VendorSettlement.findByIdAndUpdate(
     { _id },
@@ -517,10 +518,11 @@ admin.get("/vendor/recieved/request",loginAuth, async (req, res) => {
   const _id = req.body.vendorId;
   console.log("id",_id)
   const allRequest = await VendorSettlement.find({"receiver.vendorId":_id, $or: [
-    {"superAdmin.status": "returning"},
+    // {"superAdmin.status": "returning"},
     {"superAdmin.status":"forwarded"},
     // {"sendor.status":"forwarded",},
-    {"sendor.status":"requested",}
+    // {"sendor.status":"requested",},
+    { $and: [  {"sendor.status":"pending"},{"reciever.status":"accepted"},{"superAdmin.status":"returning"}] },
     
   ] });
 
