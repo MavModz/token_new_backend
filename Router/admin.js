@@ -585,7 +585,7 @@ admin.patch("/vendor/recieved/request/accept/:_id",loginAuth, async (req, res) =
       return res.status(409).json({ message: " accepeted" ,response});
   }
  
-  if(data.sender.status=="requested" && data.reciever.status=="pending"){
+  if(data.sender.status=="requested" && data.receiver.status=="pending" && data.superAdmin.status=="pending"){
     data.sendor.status=="pending"
     data.superAdmin.status=="accepted"
     const isUpdate = await VendorSettlement.findOneAndUpdate(
