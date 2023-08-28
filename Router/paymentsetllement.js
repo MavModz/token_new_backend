@@ -1,10 +1,10 @@
 const express = require("express");
 const paymentSetlement = express.Router();
 const PaymentSettlement = require("../model/paymentSettle");
-const { AdminAithentication } = require("../midleware/auth");
+const { AdminAithentication, loginAuth } = require("../midleware/auth");
 
 // GET route to fetch all payment settlements
-paymentSetlement.get("/payment-settlements",AdminAithentication, async (req, res) => {
+paymentSetlement.get("/payment-settlements",loginAuth, async (req, res) => {
   try {
     const settlements = await PaymentSettlement.find();
     res.json(settlements);
