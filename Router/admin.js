@@ -496,13 +496,11 @@ admin.post("/checkout", loginAuth, async (req, res) => {
 admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
   const _id = req.body.adminId.toString();
 
-  // const allRequest = await VendorSettlement.find({"superAdmin.adminId": _id,"sendor.status":"requested", });
+ 
   const allRequest = await VendorSettlement.find({
     "superAdmin.adminId": _id,
     $or: [
-      // { "sendor.status": "requested" },
-      // { "receiver.status": "accepted"},
-      // { "receiver.status": "rejected" },
+    
       {
         $and: [
           { "sendor.status": "requested" },
@@ -524,6 +522,28 @@ admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
           { "superAdmin.status": "requestedback" },
         ],
       },
+      {
+        $and: [
+          { "sendor.status": "pending" },
+          { "receiver.status": "accepted" },
+          { "superAdmin.status": "returning" },
+        ],
+      },
+      {
+        $and: [
+          { "sendor.status": "pending" },
+          { "receiver.status": "pending" },
+          { "superAdmin.status": "accepted" },
+        ],
+      },
+      {
+        $and: [
+          { "sendor.status":"requested" },
+          { "receiver.status":"pending" },
+          { "superAdmin.status":"forwarded" },
+        ],
+      }
+      
     ],
   });
 
@@ -571,29 +591,31 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
       },
       {
         $and: [
-          { "sendor.status": "requested" },
+          { "sendor.status": "requested" }, 
           { "receiver.status": "pending" },
           { "superAdmin.status": "forwarded" },
         ],
+       
       },
+      {
+        $and: [
+          { "sendor.status": "requested" },
+          { "receiver.status": "accepted" },
+          { "superAdmin.status": "requestedback" },
+        ],
+      },
+
     ],
   });
 
   console.log(allRequest);
 
   if (allRequest.length == 0 || !allRequest) {
-    // return res
-    //   .status(404)
-    //   .json({ message: "no incoming settlement avavilable.." });
+ 
     const allReq = await VendorSettlement.find({
       "receiver.vendorId": _id,
       $or: [
-        // {"superAdmin.status": "returning"},
-        //   // {"superAdmin.status":"forwarded"},
-        //   // {"sendor.status":"forwarded",},
-        //   {"receiver.status":"accepted"},
-        //   {"sendor.status":"pending"},
-        // { $and: [  {"sendor.status":"requested"},{"receiver.status":"pending"},{"superAdmin.status":"forwarded"}] },
+        
         {
           $and: [
             { "sendor.status": "requested" },
@@ -622,6 +644,21 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
             { "superAdmin.status": "forwarded" },
           ],
         },
+        {
+          $and: [
+            { "sendor.status": "pending" },
+            { "receiver.status": "accepted" },
+            { "superAdmin.status": "returning" },
+          ],
+        },
+        {
+          $and: [
+            { "sendor.status": "requested" },
+            { "receiver.status": "accepted" },
+            { "superAdmin.status": "requestedback" },
+          ],
+        },
+        
       ],
     });
     return res
@@ -635,69 +672,7 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
 });
 
 
-
-
-
-// admin.get("/vendor/recieved/request/accepted", loginAuth, async (req, res) => {
-//   const _id = req.body.vendorId;
-//   console.log("id", _id);
-
-//   const allRequest = await VendorSettlement.find({
-//     "receiver.vendorId": _id,
-//     $or: [
-//       // {"superAdmin.status": "returning"},
-//       //   // {"superAdmin.status":"forwarded"},
-//       //   // {"sendor.status":"forwarded",},
-//       //   {"receiver.status":"accepted"},
-//       //   {"sendor.status":"pending"},
-//       // { $and: [  {"sendor.status":"requested"},{"receiver.status":"pending"},{"superAdmin.status":"forwarded"}] },
-//       {
-//         $and: [
-//           { "sendor.status": "requested" },
-//           { "receiver.status": "pending" },
-//           { "superAdmin.status": "accepted" },
-//         ],
-//       },
-//       {
-//         $and: [
-//           { "sendor.status": "requested" },
-//           { "receiver.status": "pending" },
-//           { "superAdmin.status": "forwarded" },
-//         ],
-//       },
-//       {
-//         $and: [
-//           { "sendor.status": "pending" },
-//           { "receiver.status": "accepted" },
-//           { "superAdmin.status": "returning" },
-//         ],
-//       },
-//       {
-//         $and: [
-//           { "sendor.status": "pending" },
-//           { "receiver.status": "pending" },
-//           { "superAdmin.status": "accepted" },
-//         ],
-//       },
-//     ],
-//   });
-
-//   console.log(allRequest);
-
-//   if (allRequest.length == 0 || !allRequest) {
-//     return res
-//       .status(404)
-//       .json({ message: "no incoming settlement avavilable.." });
-//   }
-
-//   res
-//     .status(200)
-//     .json({ message: "here all the pending request..", allRequest });
-// });
-
-admin.patch(
-  "/vendor/recieved/request/accept/:_id",
-  loginAuth,
+admin.patch("/vendor/recieved/request/accept/:_id",loginAuth,
   async (req, res) => {
     const { _id } = req.params;
 
@@ -779,10 +754,7 @@ admin.patch(
   }
 );
 
-admin.patch(
-  "/vendor/recieved/request/rejected/:_id",
-  loginAuth,
-  async (req, res) => {
+admin.patch("/vendor/recieved/request/rejected/:_id",loginAuth,async (req, res) => {
     const { _id } = req.params;
 
     const data = await VendorSettlement.findOne({ _id });
@@ -808,27 +780,6 @@ admin.patch(
   }
 );
 
-// admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
-//   const { _id } = req.params;
-
-//   const data = await VendorSettlement.findOne({ _id });
-
-//   data.superAdmin.status ="accepted";
-//   data.sendor.status = "requested";
-
-//   const isUpdate = await VendorSettlement.findByIdAndUpdate(
-//     { _id },
-//     { ...data }
-//   );
-
-//   console.log(isUpdate);
-
-//   if (!isUpdate) {
-//     return res.status(500).json({ message: "something went wrong..." });
-//   }
-
-//   return res.status(200).json({ message: "return to vendor..." });
-// });
 
 function getFormattedDateSixMonthsLater() {
   const currentDate = new Date();
