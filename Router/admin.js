@@ -567,12 +567,32 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
   const allRequest = await VendorSettlement.find({
     "sendor.vendorId": _id,
     $or: [
-      
+      {
+        $and: [
+          { "sendor.status": "pending" },
+          { "receiver.status": "pending" },
+          { "superAdmin.status": "pending" },
+        ],
+      },
       {
         $and: [
           { "sendor.status": "requested" },
           { "receiver.status": "pending" },
-          { "superAdmin.status": "accepted" },
+          { "superAdmin.status": "pending" },
+        ],
+      },
+      {
+        $and: [
+          { "sendor.status": "requested" },
+          { "receiver.status": "pending" },
+          { "superAdmin.status": "forwarded" },
+        ],
+      },
+      {
+        $and: [
+          { "sendor.status": "requested" },
+          { "receiver.status": "accepted" },
+          { "superAdmin.status": "requestedback" },
         ],
       },
       {
@@ -584,19 +604,26 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
       },
       {
         $and: [
+          { "sendor.status": "requested" },
+          { "receiver.status": "pending" },
+          { "superAdmin.status": "accepted" },
+        ],
+      },
+      {
+        $and: [
           { "sendor.status": "pending" },
           { "receiver.status": "pending" },
           { "superAdmin.status": "accepted" },
         ],
       },
-      // {
-      //   $and: [
-      //     { "sendor.status": "requested" }, 
-      //     { "receiver.status": "pending" },
-      //     { "superAdmin.status": "forwarded" },
-      //   ],
+      {
+        $and: [
+          { "sendor.status": "requested" }, 
+          { "receiver.status": "pending" },
+          { "superAdmin.status": "forwarded" },
+        ],
        
-      // },
+      },
       {
         $and: [
           { "sendor.status": "requested" },
@@ -624,13 +651,13 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
             { "superAdmin.status": "accepted" },
           ],
         },
-        {
-          $and: [
-            { "sendor.status": "pending" },
-            { "receiver.status": "accepted" },
-            { "superAdmin.status": "returning" },
-          ],
-        },
+        // {
+        //   $and: [
+        //     { "sendor.status": "pending" },
+        //     { "receiver.status": "accepted" },
+        //     { "superAdmin.status": "returning" },
+        //   ],
+        // },
         {
           $and: [
             { "sendor.status": "pending" },
@@ -645,13 +672,13 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
             { "superAdmin.status": "forwarded" },
           ],
         },
-        {
-          $and: [
-            { "sendor.status": "pending" },
-            { "receiver.status": "accepted" },
-            { "superAdmin.status": "returning" },
-          ],
-        },
+        // {
+        //   $and: [
+        //     { "sendor.status": "pending" },
+        //     { "receiver.status": "accepted" },
+        //     { "superAdmin.status": "returning" },
+        //   ],
+        // },
         {
           $and: [
             { "sendor.status": "requested" },
