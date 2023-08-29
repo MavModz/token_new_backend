@@ -589,14 +589,14 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
           { "superAdmin.status": "accepted" },
         ],
       },
-      {
-        $and: [
-          { "sendor.status": "requested" }, 
-          { "receiver.status": "pending" },
-          { "superAdmin.status": "forwarded" },
-        ],
+      // {
+      //   $and: [
+      //     { "sendor.status": "requested" }, 
+      //     { "receiver.status": "pending" },
+      //     { "superAdmin.status": "forwarded" },
+      //   ],
        
-      },
+      // },
       {
         $and: [
           { "sendor.status": "requested" },
@@ -604,6 +604,7 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
           { "superAdmin.status": "requestedback" },
         ],
       },
+
 
     ],
   });
