@@ -331,7 +331,7 @@ admin.get("/personalInfo", loginAuth, async (req, res) => {
 });
 
 //checkout route
-
+//save
 admin.post("/checkout", loginAuth, async (req, res) => {
   const vendor_id = req.body.vendorId;
   const data = await userModel.find({ mobile: req.body.phoneNumber });
