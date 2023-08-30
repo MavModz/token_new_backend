@@ -496,11 +496,9 @@ admin.post("/checkout", loginAuth, async (req, res) => {
 admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
   const _id = req.body.adminId.toString();
 
- 
   const allRequest = await VendorSettlement.find({
     "superAdmin.adminId": _id,
     $or: [
-    
       {
         $and: [
           { "sendor.status": "requested" },
@@ -538,12 +536,11 @@ admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
       },
       {
         $and: [
-          { "sendor.status":"requested" },
-          { "receiver.status":"pending" },
-          { "superAdmin.status":"forwarded" },
+          { "sendor.status": "requested" },
+          { "receiver.status": "pending" },
+          { "superAdmin.status": "forwarded" },
         ],
-      }
-      
+      },
     ],
   });
 
@@ -561,153 +558,202 @@ admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
 });
 
 //vendor recieved request
+// admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
+//   const _id = req.body.vendorId;
+//   console.log("id", _id);
+//   const allRequest = await VendorSettlement.find({
+//     "sendor.vendorId": _id,
+//     $or: [
+//       {
+//         $and: [
+//           { "sendor.status": "pending" },
+//           { "receiver.status": "pending" },
+//           { "superAdmin.status": "pending" },
+//         ],
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "requested" },
+//           { "receiver.status": "pending" },
+//           { "superAdmin.status": "pending" },
+//         ],
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "requested" },
+//           { "receiver.status": "pending" },
+//           { "superAdmin.status": "forwarded" },
+//         ],
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "requested" },
+//           { "receiver.status": "accepted" },
+//           { "superAdmin.status": "requestedback" },
+//         ],
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "pending" },
+//           { "receiver.status": "accepted" },
+//           { "superAdmin.status": "returning" },
+//         ],
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "requested" },
+//           { "receiver.status": "pending" },
+//           { "superAdmin.status": "accepted" },
+//         ],
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "pending" },
+//           { "receiver.status": "pending" },
+//           { "superAdmin.status": "accepted" },
+//         ],
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "requested" },
+//           { "receiver.status": "pending" },
+//           { "superAdmin.status": "forwarded" },
+//         ],
+
+//       },
+//       {
+//         $and: [
+//           { "sendor.status": "requested" },
+//           { "receiver.status": "accepted" },
+//           { "superAdmin.status": "requestedback" },
+//         ],
+//       },
+
+//     ],
+//   });
+
+//   console.log(allRequest);
+
+//   if (allRequest.length == 0 || !allRequest) {
+
+//     const allReq = await VendorSettlement.find({
+//       "receiver.vendorId": _id,
+//       $or: [
+
+//         {
+//           $and: [
+//             { "sendor.status": "requested" },
+//             { "receiver.status": "pending" },
+//             { "superAdmin.status": "accepted" },
+//           ],
+//         },
+//         // {
+//         //   $and: [
+//         //     { "sendor.status": "pending" },
+//         //     { "receiver.status": "accepted" },
+//         //     { "superAdmin.status": "returning" },
+//         //   ],
+//         // },
+//         {
+//           $and: [
+//             { "sendor.status": "pending" },
+//             { "receiver.status": "pending" },
+//             { "superAdmin.status": "accepted" },
+//           ],
+//         },
+//         {
+//           $and: [
+//             { "sendor.status": "requested" },
+//             { "receiver.status": "pending" },
+//             { "superAdmin.status": "forwarded" },
+//           ],
+//         },
+//         // {
+//         //   $and: [
+//         //     { "sendor.status": "pending" },
+//         //     { "receiver.status": "accepted" },
+//         //     { "superAdmin.status": "returning" },
+//         //   ],
+//         // },
+//         {
+//           $and: [
+//             { "sendor.status": "requested" },
+//             { "receiver.status": "accepted" },
+//             { "superAdmin.status": "requestedback" },
+//           ],
+//         },
+
+//       ],
+//     });
+//     return res
+//       .status(200)
+//       .json({ message: "here all the pending request..", allReq });
+//   }
+
+//   res
+//     .status(200)
+//     .json({ message: "here all the pending request..", allRequest });
+// });
+
 admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
   const _id = req.body.vendorId;
   console.log("id", _id);
-  const allRequest = await VendorSettlement.find({
+  const allReq = await VendorSettlement.find({
     "sendor.vendorId": _id,
     $or: [
-      {
-        $and: [
-          { "sendor.status": "pending" },
-          { "receiver.status": "pending" },
-          { "superAdmin.status": "pending" },
-        ],
-      },
-      {
-        $and: [
-          { "sendor.status": "requested" },
-          { "receiver.status": "pending" },
-          { "superAdmin.status": "pending" },
-        ],
-      },
-      {
-        $and: [
-          { "sendor.status": "requested" },
-          { "receiver.status": "pending" },
-          { "superAdmin.status": "forwarded" },
-        ],
-      },
-      {
-        $and: [
-          { "sendor.status": "requested" },
-          { "receiver.status": "accepted" },
-          { "superAdmin.status": "requestedback" },
-        ],
-      },
-      {
-        $and: [
-          { "sendor.status": "pending" },
-          { "receiver.status": "accepted" },
-          { "superAdmin.status": "returning" },
-        ],
-      },
-      {
-        $and: [
-          { "sendor.status": "requested" },
-          { "receiver.status": "pending" },
-          { "superAdmin.status": "accepted" },
-        ],
-      },
-      {
-        $and: [
-          { "sendor.status": "pending" },
-          { "receiver.status": "pending" },
-          { "superAdmin.status": "accepted" },
-        ],
-      },
-      {
-        $and: [
-          { "sendor.status": "requested" }, 
-          { "receiver.status": "pending" },
-          { "superAdmin.status": "forwarded" },
-        ],
-       
-      },
-      {
-        $and: [
-          { "sendor.status": "requested" },
-          { "receiver.status": "accepted" },
-          { "superAdmin.status": "requestedback" },
-        ],
-      },
+      { "sendor.status": { $ne: "accepted" } },
+      { "sendor.status": "requested" },
+      { "receiver.status": "pending" },
+      { "superAdmin.status": "pending" },
+      { "superAdmin.status": "forwarded" },
+      { "receiver.status": "accepted" },
+      { "superAdmin.status": "requestedback" },
+      { "superAdmin.status": "returning" },
+      { "superAdmin.status": "accepted" },
+    
 
+    ],
+  });
+  
+
+  const allReqs = await VendorSettlement.find({
+    "reciever.vendorId": _id,
+    $or: [
+      { "superAdmin.status": "forwarded" },
+      { "superAdmin.status": "returning" },
+      { "superAdmin.status": "requestedback" },
 
     ],
   });
 
-  console.log(allRequest);
 
-  if (allRequest.length == 0 || !allRequest) {
- 
-    const allReq = await VendorSettlement.find({
-      "receiver.vendorId": _id,
-      $or: [
-        
-        {
-          $and: [
-            { "sendor.status": "requested" },
-            { "receiver.status": "pending" },
-            { "superAdmin.status": "accepted" },
-          ],
-        },
-        // {
-        //   $and: [
-        //     { "sendor.status": "pending" },
-        //     { "receiver.status": "accepted" },
-        //     { "superAdmin.status": "returning" },
-        //   ],
-        // },
-        {
-          $and: [
-            { "sendor.status": "pending" },
-            { "receiver.status": "pending" },
-            { "superAdmin.status": "accepted" },
-          ],
-        },
-        {
-          $and: [
-            { "sendor.status": "requested" },
-            { "receiver.status": "pending" },
-            { "superAdmin.status": "forwarded" },
-          ],
-        },
-        // {
-        //   $and: [
-        //     { "sendor.status": "pending" },
-        //     { "receiver.status": "accepted" },
-        //     { "superAdmin.status": "returning" },
-        //   ],
-        // },
-        {
-          $and: [
-            { "sendor.status": "requested" },
-            { "receiver.status": "accepted" },
-            { "superAdmin.status": "requestedback" },
-          ],
-        },
-        
-      ],
-    });
-    return res
-      .status(200)
-      .json({ message: "here all the pending request..", allReq });
+
+  if(allReq.length==0){
+    res
+    .status(200)
+    .json({ message: "here all the pending request..", allReqs });
+  }else{
+    res
+    .status(200)
+    .json({ message: "here all the pending request..", allReq });
   }
 
-  res
-    .status(200)
-    .json({ message: "here all the pending request..", allRequest });
+
+
 });
 
-
-admin.patch("/vendor/recieved/request/accept/:_id",loginAuth,
+admin.patch(
+  "/vendor/recieved/request/accept/:_id",
+  loginAuth,
   async (req, res) => {
     const { _id } = req.params;
-
+    console.log(_id);
     const data = await VendorSettlement.findOne({ _id });
+    console.log(data);
 
     if (
-      data.superAdmin.status == "accepted" && data.receiver.status == "accepted"
+      data.superAdmin.status == "accepted" &&
+      data.receiver.status == "accepted"
     ) {
       return res.status(409).json({ message: "already accepeted" });
     }
@@ -782,7 +828,10 @@ admin.patch("/vendor/recieved/request/accept/:_id",loginAuth,
   }
 );
 
-admin.patch("/vendor/recieved/request/rejected/:_id",loginAuth,async (req, res) => {
+admin.patch(
+  "/vendor/recieved/request/rejected/:_id",
+  loginAuth,
+  async (req, res) => {
     const { _id } = req.params;
 
     const data = await VendorSettlement.findOne({ _id });
@@ -807,7 +856,6 @@ admin.patch("/vendor/recieved/request/rejected/:_id",loginAuth,async (req, res) 
     return res.status(200).json({ message: "succesfully rejected" });
   }
 );
-
 
 function getFormattedDateSixMonthsLater() {
   const currentDate = new Date();
