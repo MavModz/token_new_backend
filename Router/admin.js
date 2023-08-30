@@ -1043,6 +1043,12 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
       //   { "superAdmin.status": { $ne: "pending" } },
       //   { "sendor.status": { $ne: "pending" } },
       // ],
+      $nor: [
+        {
+          "receiver.status": "pending",
+          "superAdmin.status": "pending",
+          "sendor.status": "pending",
+        },],
       $or: [
         // { "sendor.status": { $ne: "accepted" } },
         { "sendor.status": "requested" },
@@ -1075,6 +1081,7 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 });
+
 function getFormattedDateSixMonthsLater() {
   const currentDate = new Date();
   const sixMonthsLater = new Date(currentDate);
