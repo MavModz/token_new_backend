@@ -103,8 +103,11 @@ method: patch
 admin/personalInfo/update
 
 # Checkout:-
+
 This route will be used for admin and vendor
+
 method: post
+
 admin/checkout
 
 # coupon for vendor
