@@ -495,6 +495,7 @@ admin.post("/checkout", loginAuth, async (req, res) => {
               couponCode: coponCode.generate(),
               generate: {
                 vendorId: vendor_id,
+                useDate: getCurrentDateFormatted(),
               },
               price: discount,
               userName: data[0].name,
@@ -529,6 +530,7 @@ admin.post("/checkout", loginAuth, async (req, res) => {
           couponCode: coponCode.generate(),
           generate: {
             vendorId: vendor_id,
+            generateDate: getCurrentDateFormatted(),
           },
           price: discount,
           userName: data[0].name,

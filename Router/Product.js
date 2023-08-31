@@ -48,14 +48,20 @@ Product_Router.delete("/delete/:id", loginAuth, async (req, res) => {
 
 
 Product_Router.patch("/update/:id", loginAuth, async (req, res) => {
-  const { id } = req.params;
-  const data = req.body;
-  const result = await productModel.findOneAndUpdate({ _id: id }, data);
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    const result = await productModel.findOneAndUpdate({ _id: id }, data);
 
-  if (!result) {
-    res.status(404).json({ message: "product are not found" });
+    if (!result) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({ message: "Product Successfully Updated" });
+  } catch (error) {
+    console.error("Error while updating product:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-  res.status(200).json({ message: "Product are succesFully updated" });
 });
 
 module.exports = Product_Router;
