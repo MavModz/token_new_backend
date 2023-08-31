@@ -93,6 +93,38 @@ method  : PATCH
 /admin//return/: enter id as params..
 
 
+Personal Info:-
+this route will be used for all the users (super-admin,vendor,user)
+
+mehtod:get
+admin/personalInfo
+
+method: patch
+admin/personalInfo/update
+
+Checkout:-
+This route will be used for admin and vendor
+method: post
+admin/checkout
+
+
+Admin Received  Request for Approved:-
+method: get
+admin/admin/recieved/request
+
+
+Vendor Received request for approved:-
+method: get
+admin/vendor/recieved/request
+
+method:patch
+admin/vendor/recieved/request/accept/:_id
+
+
+
+
+
+
 
 
 
