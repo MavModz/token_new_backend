@@ -93,7 +93,7 @@ method  : PATCH
 /admin//return/: enter id as params..
 
 
-Personal Info:-
+# Personal Info:-
 this route will be used for all the users (super-admin,vendor,user)
 
 mehtod:get
@@ -102,23 +102,37 @@ admin/personalInfo
 method: patch
 admin/personalInfo/update
 
-Checkout:-
+# Checkout:-
 This route will be used for admin and vendor
 method: post
 admin/checkout
 
+# coupon for vendor
+/admin/settle/coupon/:TovendorId
 
-Admin Received  Request for Approved:-
+# send request
+/admin/settle/send/:couponCode
+
+# Admin Received  Request for Approved:-
 method: get
 admin/admin/recieved/request
 
+# Admin Received  Request for Approved will forward:-
+method:post
+admin/forward/:_id
 
-Vendor Received request for approved:-
+# Admin Received  Request for Approved will return:-
+method:patch
+admin/return/:_id
+
+# Vendor Received request for approved:-
 method: get
 admin/vendor/recieved/request
 
-method:patch
+# Vendor Received request for approved will update:-
+method: patch
 admin/vendor/recieved/request/accept/:_id
+
 
 
 
