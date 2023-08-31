@@ -100,6 +100,8 @@ mehtod:get
 
 admin/personalInfo
 
+this route will be used for all the users (super-admin,vendor,user)
+
 method: patch
 
 admin/personalInfo/update
