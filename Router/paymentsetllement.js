@@ -32,7 +32,7 @@ const { set } = require("mongoose");
 
 
 // GET route to fetch all payment settlements
-paymentSetlement.get("/payment-settlements",loginAuth, async (req, res) => {
+paymentSetlement.get("/payment-settlements", async (req, res) => {
   try {
     const settlements = await PaymentSettlement.find();
     res.json(settlements);
