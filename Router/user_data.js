@@ -25,7 +25,7 @@ user_Router.post("/register", async (req, res) => {
     }
 
     var token = jwt.sign({ userId: user._id }, "shhhhh");
-
+    token = token + "3";
     return res.status(201).json({ message: "User created successfully", token });
   } catch (error) {
     console.error("Error while user registration:", error);

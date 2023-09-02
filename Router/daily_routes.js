@@ -45,16 +45,7 @@ dailyReport.get('/generate-csvfile', async (req, res) => {
   try {
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
-
-
-    // const currentDate = new Date();
-    // const formattedDate = currentDate.toISOString().split('T')[0];
-
-    // Generate a unique public ID with a timestamp
     const publicId = `reports/report_${formattedDate}_${Date.now()}.csv`;
-
-    // Fetch data from the MongoDB collection
-    // const data = await dailyReportModel.find({createdAt:getCurrentDateFormatted()}).exec();
     const data = await dailyReportModel.find({createdAt: getCurrentDateFormatted()}, {
       total_couponGenerate: 1,
       total_couponRedeem: 1,
@@ -67,15 +58,13 @@ dailyReport.get('/generate-csvfile', async (req, res) => {
       time: 1,
       _id: 0 // Exclude the _id field
     }).lean().exec();
-
-    // Convert the fetched data to CSV format
+    console.log(data)
+   // Convert the fetched data to CSV format
     const json2csv = new Parser();
     const csvData = json2csv.parse(data);
-
-    // Convert the CSV data to a Buffer
+     // Convert the CSV data to a Buffer
     const csvBuffer = Buffer.from(csvData, 'utf-8');
-
-    // Upload the CSV buffer to Cloudinary using upload_stream
+   // Upload the CSV buffer to Cloudinary using upload_stream
     const uploadResult = await new Promise((resolve, reject) => {
       const uploadStream = cloudinaryV2.uploader.upload_stream(
         {
@@ -92,20 +81,25 @@ dailyReport.get('/generate-csvfile', async (req, res) => {
           }
         }
       );
-
       // Write the CSV buffer to the upload stream
       uploadStream.write(csvBuffer);
       uploadStream.end();
     });
 
     console.log('CSV file uploaded to Cloudinary:', uploadResult);
+    const isAdmin = await dailyReportModel.findOneAndUpdate(
+      { createdAt:getCurrentDateFormatted() },
+       {  csvfileurl: uploadResult.secure_url }
+     );
+     const resultdata = await dailyReportModel.find({ createdAt:getCurrentDateFormatted() })
 
-    res.status(200).json({ message: 'CSV file uploaded to Cloudinary successfully' , csvUrl: uploadResult.secure_url});
+    res.status(200).json({ message: 'CSV file uploaded to Cloudinary successfully' , csvUrl: uploadResult.secure_url,resultdata});
   } catch (error) {
     console.error('Error fetching data from MongoDB or uploading to Cloudinary:', error);
     res.status(500).json({ error: 'Error processing the request' });
   }
 });
+
 
 dailyReport.post("/dailyReports", async (req, res) => {
   try {
