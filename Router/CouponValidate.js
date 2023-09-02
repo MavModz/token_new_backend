@@ -3,12 +3,10 @@ const express = require("express");
 const Admin = require("../model/Admin_Model");
 const { sendNotification } = require("./firebase");
 
-
 const {
-    loginAuth,
+    loginAuth, AdminAithentication,
   } = require("../midleware/auth");
-
-
+const { userAuth } = require("../midleware/userAuth");
 
 const Coupon_validate = express.Router();
 
@@ -36,10 +34,8 @@ Coupon_validate.get("/", loginAuth, async (req, res) => {
   }
 });
 
-  
 
-
-  Coupon_validate.post("/:coupon", loginAuth, async (req, res) => {
+Coupon_validate.post("/:coupon", loginAuth, async (req, res) => {
     try {
       const { coupon } = req.params;
   
@@ -78,15 +74,51 @@ Coupon_validate.get("/", loginAuth, async (req, res) => {
       console.error("Error while validating coupon:", error);
       res.status(500).json({ message: "Internal server error" });
     }
-  });
+});
   
+//user get coupon
+Coupon_validate.get("/usercoupon", userAuth, async (req, res) => {
+    try {
+      const userId = req.body.userId;
+      const couponlist = await CouponModel.find({ userID: userId });
+      res.status(200).json(couponlist);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error" });
+    }
+});
 
+// admin  
+Coupon_validate.get("/admincoupon", AdminAithentication, async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const couponlist = await CouponModel.find();
+    res.status(200).json(couponlist);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
+Coupon_validate.get("/vendorcoupon", loginAuth, async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const couponlist = await CouponModel.find({
+      $or: [
+        {"generate.vendorId": req.body.vendorId},
+        {"redeem.vendorId": req.body.vendorId}
+      ]
+    });
+    res.status(200).json(couponlist);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
-
-  function isCouponExpired(coupon) {
+function isCouponExpired(coupon) {
     const currentDate = new Date();
     return currentDate > coupon.expirationDate;
-  }
+}
 
   module.exports = Coupon_validate

@@ -8,11 +8,7 @@ const { sendNotification } = require("./firebase");
 const VendorSettlement = require("../model/Settlement");
 const cloudinary = require("./cloudinary");
 const requestModel = require("../model/request");
-const {
-  Adminauth,
-  AdminAithentication,
-  loginAuth,
-} = require("../midleware/auth");
+const {Adminauth,AdminAithentication,loginAuth} = require("../midleware/auth");
 
 const { adminAuth } = require("../midleware/adminAuth");
 const { paymentModel } = require("../model/Payment");
@@ -355,8 +351,6 @@ admin.patch("/return/:_id", AdminAithentication, async (req, res) => {
 });
 
 
-
-
 admin.patch("/personalInfo/update", loginAuth, async (req, res) => {
   try {
     const payload = req.body;
@@ -404,8 +398,7 @@ admin.get("/personalInfo", loginAuth, async (req, res) => {
   }
 });
 
-//checkout route
-//save
+
 admin.post("/checkout", loginAuth, async (req, res) => {
   const vendor_id = req.body.vendorId;
   const data = await userModel.find({ mobile: req.body.phoneNumber });
@@ -574,7 +567,7 @@ admin.post("/checkout", loginAuth, async (req, res) => {
 });
 
 // admin request request
-admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
+admin.get("/admin/recieved/request",AdminAithentication, async (req, res) => {
   try {
     const _id = req.body.adminId.toString();
 
@@ -621,6 +614,20 @@ admin.get("/admin/recieved/request", AdminAithentication, async (req, res) => {
             { "sendor.status": "requested" },
             { "receiver.status": "pending" },
             { "superAdmin.status": "forwarded" },
+          ],
+        },
+        {
+          $and: [
+            { "sendor.status": "pending" },
+            { "receiver.status": "accepted" },
+            { "superAdmin.status": "pending" },
+          ],
+        },
+        {
+          $and: [
+            { "sendor.status": "pending" },
+            { "receiver.status": "accepted" },
+            { "superAdmin.status": "accepted" },
           ],
         },
       ],
@@ -857,7 +864,10 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
           data.sendor.status == "pending") ||
         (data.sendor.status == "pending" &&
           data.superAdmin.status == "accepted" &&
-          data.receiver.status == "pending")
+          data.receiver.status == "pending")||
+          (data.sendor.status == "pending" &&
+          data.superAdmin.status == "pending" &&
+          data.receiver.status == "accepted")
       ) {
         data.superAdmin.status = "accepted";
         data.superAdmin.time = getCurrentTime();
@@ -898,12 +908,14 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
       }
 
       if (
+        data.superAdmin.adminId===data.receiver.vendorId &&
         data.sendor.status == "requested" &&
         data.receiver.status == "pending" &&
         data.superAdmin.status == "pending"
       ) {
         data.sendor.status = "pending";
         data.sendor.time = getCurrentTime();
+        data.receiver.status ="accepted"
         data.superAdmin.status = "accepted";
         data.superAdmin.time = getCurrentTime();
         const isUpdate = await VendorSettlement.findOneAndUpdate(
@@ -912,6 +924,26 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
         );
         return res.status(200).json({ message: "Successfully accepted" });
       }
+
+      if (
+        data.superAdmin.adminId===data.sendor.vendorId &&
+        data.sendor.status == "requested" &&
+        data.receiver.status == "pending" &&
+        data.superAdmin.status == "pending"
+      ) {
+        console.log("hii")
+        data.sendor.status = "pending";
+        data.sendor.time = getCurrentTime();
+        data.superAdmin.status = "pending";
+        data.receiver.status = "accepted"
+        data.superAdmin.time = getCurrentTime();
+        const isUpdate = await VendorSettlement.findOneAndUpdate(
+          { _id },
+          { ...data }
+        );
+        return res.status(200).json({ message: "Successfully accepted",data });
+      }
+     
 
       data.superAdmin.status = "requestedback";
       data.superAdmin.time = getCurrentTime();
@@ -935,11 +967,7 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
   }
 );
 
-
-admin.patch(
-  "/vendor/recieved/request/rejected/:_id",
-  loginAuth,
-  async (req, res) => {
+admin.patch("/vendor/recieved/request/rejected/:_id",loginAuth,async (req, res) => {
     try {
       const { _id } = req.params;
 
@@ -969,10 +997,6 @@ admin.patch(
     }
   }
 );
-
-
-
-
 
 // admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
 //   try {
@@ -1134,7 +1158,6 @@ admin.patch(
 // });
 
 
-
 admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
   try {
     const _id = req.body.vendorId;
@@ -1173,6 +1196,7 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
         { "superAdmin.status": "forwarded" },
         { "superAdmin.status": "returning" },
         { "superAdmin.status": "requestedback" },
+        { "superAdmin.status": "pending" },
       ],
     });
 
@@ -1186,6 +1210,11 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 });
+
+
+
+
+
 
 function getFormattedDateSixMonthsLater() {
   const currentDate = new Date();
@@ -1209,6 +1238,8 @@ function getCurrentDateFormatted() {
   return formattedDate;
 }
 
+console.log("getCurrentTime()",getCurrentTime())
+
 function checkCouponValidity(expirationDate) {
   const currentDate = new Date();
   const expirationDateObj = new Date(expirationDate);
@@ -1231,7 +1262,7 @@ function getCurrentTime() {
 }
 
 
-console.log("Current Time:", getCurrentTime());
+
 
 
 module.exports = admin;
