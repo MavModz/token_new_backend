@@ -623,13 +623,6 @@ admin.get("/admin/recieved/request",AdminAithentication, async (req, res) => {
             { "superAdmin.status": "pending" },
           ],
         },
-        {
-          $and: [
-            { "sendor.status": "pending" },
-            { "receiver.status": "accepted" },
-            { "superAdmin.status": "accepted" },
-          ],
-        },
       ],
     });
 
@@ -915,7 +908,6 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
       ) {
         data.sendor.status = "pending";
         data.sendor.time = getCurrentTime();
-        data.receiver.status ="accepted"
         data.superAdmin.status = "accepted";
         data.superAdmin.time = getCurrentTime();
         const isUpdate = await VendorSettlement.findOneAndUpdate(
