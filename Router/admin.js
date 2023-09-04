@@ -897,7 +897,7 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
           { ...data }
         );
         const response = await paymentsettlemen.save();
-        return res.status(409).json({ message: "Accepted", response });
+        return res.status(200).json({ message: "Accepted", response });
       }
 
       if (
@@ -1184,12 +1184,24 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
 
     const allReqs = await VendorSettlement.find({
       "receiver.vendorId": _id,
+      $nor: [
+        {
+          "receiver.status": "pending",
+          "superAdmin.status": "pending",
+          "sendor.status": "pending",
+        },],
       $or: [
         { "superAdmin.status": "forwarded" },
         { "superAdmin.status": "returning" },
         { "superAdmin.status": "requestedback" },
-        { "superAdmin.status": "pending" },
+        // { "superAdmin.status": "pending" },
       ],
+      $and: [
+        {
+          "superAdmin.status": "pending",
+          "superAdmin.adminId":"sendor.vendorId"
+        },
+    ],
     });
 
     const data = [...allReq, ...allReqs];
