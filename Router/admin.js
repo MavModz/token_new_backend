@@ -1203,7 +1203,35 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
         },
     ],
     });
-
+    // const allReqs = await VendorSettlement.find({
+    //   "receiver.vendorId": _id,
+    //        $nor: [
+    //     {
+    //       "receiver.status": "pending",
+    //       "superAdmin.status": "pending",
+    //       "sendor.status": "pending",
+    //     },{
+    //       "receiver.status": "accepted",
+    //       "superAdmin.status": "accepted",
+    //       "sendor.status": "accepted",
+    //     },],
+    
+    //   $or: [
+    //     {
+    //       "superAdmin.status": { $in: ["requested", "forwarded", "requestedback",] }
+    //     },
+    //     {
+    //       "superAdmin.status": "pending",
+    //       "superAdmin.adminId": "sendor.vendorId"
+    //     },
+    //     {},
+        
+    //     // Add other $or conditions as needed
+    //   ]
+    // });
+    
+    
+    
     const data = [...allReq, ...allReqs];
     res.status(200).json({
       message: "Here are all the pending requests.",
