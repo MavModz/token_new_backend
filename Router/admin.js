@@ -416,6 +416,7 @@ admin.post("/checkout", loginAuth, async (req, res) => {
         const couponValid = await CouponModel.find({
           couponCode: req.body.coupon,
         });
+        console.log("b",couponValid)
         console.log(couponValid[0].generate.vendorId);
 
         const generateCopoun = await Admin.find({
@@ -1182,27 +1183,44 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
       ],
     });
 
-    const allReqs = await VendorSettlement.find({
-      "receiver.vendorId": _id,
-      $nor: [
-        {
-          "receiver.status": "pending",
-          "superAdmin.status": "pending",
-          "sendor.status": "pending",
-        },],
-      $or: [
-        { "superAdmin.status": "forwarded" },
-        { "superAdmin.status": "returning" },
-        { "superAdmin.status": "requestedback" },
-        // { "superAdmin.status": "pending" },
-      ],
-      $and: [
-        {
-          "superAdmin.status": "pending",
-          "superAdmin.adminId":"sendor.vendorId"
-        },
-    ],
-    });
+    // const allReqs = await VendorSettlement.find({
+    //   "receiver.vendorId": _id,
+    //   $nor: [
+    //     {
+    //       "receiver.status": "pending",
+    //       "superAdmin.status": "pending",
+    //       "sendor.status": "pending",
+    //     },  {
+    //       "receiver.status": "accepted",
+    //       "superAdmin.status": "accepted",
+    //       "sendor.status": "accepted",
+    //     },],
+    //   $or: [
+    //     { "superAdmin.status": "forwarded" },
+    //     { "superAdmin.status": "returning" },
+    //     { "superAdmin.status": "requestedback" },
+    //     {
+    //       "superAdmin.status": "pending",
+    //       "sendor.vendorId": { $eq:"superAdmin.adminId" } 
+         
+    //     },
+      
+    //    { $and: [
+      
+    //       {
+    //         "superAdmin.status": "pending",
+    //         "sendor.vendorId": { $eq:"superAdmin.adminId" } 
+           
+    //       },
+    //   ],
+    // },
+      
+    //   ],
+
+    // });
+
+
+
     // const allReqs = await VendorSettlement.find({
     //   "receiver.vendorId": _id,
     //        $nor: [
@@ -1231,9 +1249,51 @@ admin.get("/vendor/recieved/request", loginAuth, async (req, res) => {
     // });
     
     
-    
-    const data = [...allReq, ...allReqs];
-    res.status(200).json({
+  // const allReqs = await VendorSettlement.find({
+  //     "receiver.vendorId": _id,
+  //   // $and: [
+  //   //   {
+  //   //     superAdmin: { $nin: ["pending"] },
+  //   //     vendor: { $nin: ["pending"] },
+  //   //     receiver: { $nin: ["pending"] }
+  //   //   },
+  //     // {
+  //       $nor: [
+  //             {
+  //               "receiver.status": "pending",
+  //               "superAdmin.status": "pending",
+  //               "sendor.status": "pending",
+  //             },],
+  //       $or: [
+  //         { superAdmin: { $in: ["forwarded", "requestedback", "return","pending"] } },
+  //         // { superAdmin: "pending","superAdmin.adminId":sender.vendor_id}
+  //       ]
+  //     // }
+  //   // ]
+  // })
+
+  const allReqs = await VendorSettlement.find({
+    "receiver.vendorId": _id,
+  })
+  console.log(allReqs)
+  
+  const all = allReqs.filter((e, i) => {
+    return (
+
+        e.superAdmin.status == "returning" ||
+      e.superAdmin.status == "requestedback" ||
+      e.superAdmin.status == "forwarded"||
+     (e.superAdmin.adminId === e.sendor.vendorId &&
+        e.superAdmin.status === "pending" && e.sendor.status === "requested")||
+        (e.superAdmin.adminId === e.sendor.vendorId &&
+          e.superAdmin.status === "pending" && e.sendor.status === "pending" && e.receiver.status==="accepted")
+     
+    );
+  });
+  
+  
+  const data = [...allReq, ...all];
+  res.status(200).json({
       message: "Here are all the pending requests.",
       data,
     });
