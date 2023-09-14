@@ -1786,9 +1786,9 @@ admin.get("/wallet", loginAuth, async (req, res) => {
       return res.status(204).json({ message: "No points available",point });
     }
   
-    const max = coupons.reduce((acc, current) => acc + +current.point, 0);
+    const num = coupons.reduce((acc, current) => acc + +current.point, 0);
 
-      
+    const max = num.toFixed(2);
     return res.status(200).json({ message: "Here are all the Points", max });
   } catch (error) {
     console.error("Error while fetching wallet:", error);
