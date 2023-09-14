@@ -3,10 +3,13 @@ const express = require("express");
 const Admin = require("../model/Admin_Model");
 const { sendNotification } = require("./firebase");
 
+
 const {
     loginAuth, AdminAithentication,
   } = require("../midleware/auth");
 const { userAuth } = require("../midleware/userAuth");
+
+const itemsPerPage = 8;
 
 const Coupon_validate = express.Router();
 
@@ -34,8 +37,10 @@ Coupon_validate.get("/", loginAuth, async (req, res) => {
   }
 });
 
+  
 
-Coupon_validate.post("/:coupon", loginAuth, async (req, res) => {
+
+  Coupon_validate.post("/:coupon", loginAuth, async (req, res) => {
     try {
       const { coupon } = req.params;
   
@@ -74,51 +79,123 @@ Coupon_validate.post("/:coupon", loginAuth, async (req, res) => {
       console.error("Error while validating coupon:", error);
       res.status(500).json({ message: "Internal server error" });
     }
-});
+  });
   
+
+
 //user get coupon
 Coupon_validate.get("/usercoupon", userAuth, async (req, res) => {
-    try {
-      const userId = req.body.userId;
-      const couponlist = await CouponModel.find({ userID: userId });
-      res.status(200).json(couponlist);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Server error" });
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const userId = req.body.userId;
+    const couponlist = await CouponModel.find({ userID: userId });
+
+    const valid_c = await CouponModel.find({ userID: userId,"redeem.vendorId":"N/A"});
+    const redeem_c = await CouponModel.find({ userID: userId, "redeem.vendorId": { $ne: "N/A" } });
+
+    total_coupon=couponlist.length||0
+    redeem_coupon=redeem_c.length||0
+    valid_coupon=valid_c.length||0
+    if(couponlist.length==0){
+      return res.status(204).json({ message: "no coupon avialable" });
     }
+    const itemsToSend = couponlist  .slice(startIndex, endIndex);
+    const totalPages = Math.ceil(couponlist .length / itemsPerPage);
+    res.status(200).json({ message: "Here are all the coupons", couponlist :itemsToSend ,
+    currentPage: page,
+    totalPages: totalPages,
+    total_coupon,
+    redeem_coupon,
+    valid_coupon
+  });
+  
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // admin  
 Coupon_validate.get("/admincoupon", AdminAithentication, async (req, res) => {
-  try {
-    const userId = req.body.userId;
-    const couponlist = await CouponModel.find();
-    res.status(200).json(couponlist);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+try {
+  console.log("hghgh", req.body.adminId)
+  const page = parseInt(req.query.page) || 1;
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+
+  const couponlist = await CouponModel.find();
+  const vendors = await Admin.find({ status: "completed"});
+
+  const valid_c = await CouponModel.find({ "generate.vendorId":  req.body.adminId});
+  const redeem_c = await CouponModel.find({"redeem.vendorId":  req.body.adminId });
+
+  redeem_coupon=redeem_c.length||0
+  valid_coupon=valid_c.length||0
+  vendor_length=vendors.length||0
+
+  if(couponlist.length==0){
+    return res.status(204).json({ message: "no coupon avialable" });
   }
+  const itemsToSend = couponlist.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(couponlist .length / itemsPerPage);
+
+  res.status(200).json({ message: "Here are all the coupons", couponlist :itemsToSend ,
+  currentPage: page,
+  totalPages: totalPages,
+  valid_coupon,
+ redeem_coupon
+});
+} catch (error) {
+  console.error(error);
+  res.status(500).json({ error: "Server error" });
+}
 });
 
 Coupon_validate.get("/vendorcoupon", loginAuth, async (req, res) => {
-  try {
-    const userId = req.body.userId;
-    const couponlist = await CouponModel.find({
-      $or: [
-        {"generate.vendorId": req.body.vendorId},
-        {"redeem.vendorId": req.body.vendorId}
-      ]
-    });
-    res.status(200).json(couponlist);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error" });
+try {
+  const page = parseInt(req.query.page) || 1;
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const userId = req.body.userId;
+  const couponlist = await CouponModel.find({
+    $or: [
+      {"generate.vendorId": req.body.vendorId},
+      {"redeem.vendorId": req.body.vendorId}
+    ]
+  });
+
+  const vendors = await Admin.find({ status: "completed"});
+
+  const valid_c = await CouponModel.find({ "generate.vendorId": req.body.vendorId,});
+  const redeem_c = await CouponModel.find({"redeem.vendorId": req.body.vendorId });
+
+  redeem_coupon=redeem_c.length||0
+  valid_coupon=valid_c.length||0
+  vendor_length=vendors.length||0
+
+  if(couponlist.length==0){
+    return res.status(204).json({ message: "no coupon avialable" });
   }
+  const itemsToSend = couponlist  .slice(startIndex, endIndex);
+  const totalPages = Math.ceil(couponlist .length / itemsPerPage);
+  res.status(200).json({ message: "Here are all the coupons", couponlist :itemsToSend ,
+  currentPage: page,
+  totalPages: totalPages,
+  valid_coupon,
+  redeem_coupon
+});
+} catch (error) {
+  console.error(error);
+  res.status(500).json({ error: "Server error" });
+}
 });
 
-function isCouponExpired(coupon) {
+  function isCouponExpired(coupon) {
     const currentDate = new Date();
     return currentDate > coupon.expirationDate;
-}
+  }
 
   module.exports = Coupon_validate

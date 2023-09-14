@@ -14,6 +14,10 @@ const dailyReport=require("./Router/daily_routes")
 const dailyReportModel  = require('./model/daily_reports');
 const CouponModel = require("./model/coupon");
 const VendorSettlement = require("./model/Settlement");
+const fs = require('fs');
+const { Parser } = require('json2csv');
+const cloudinary = require("./Router/cloudinary");
+const { v2: cloudinaryV2 } = require('cloudinary');
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -25,7 +29,6 @@ app.use(express.json());
     const data = await CouponModel.find();
     const setle = await VendorSettlement.find();
 
-    // console.log(setle.length)
     const total_couponGenerate = data.reduce((s, e) => {
       // console.log(e.generate.generateDate)
       if (e.generate.generateDate === getCurrentDateFormatted()) {
@@ -73,11 +76,6 @@ app.use(express.json());
       return tba;
     }, 0);
 
-
-
-    // ... Rest of your code ...
-
-    // Create and save the daily report
     const dailyReport = await dailyReportModel({
       total_couponGenerate,
       total_couponRedeem,
@@ -88,21 +86,68 @@ app.use(express.json());
       totalAmountTake: 0,
       createdAt: getCurrentDateFormatted(),
       time: getCurrentTime(),
+      
     });
     const result = await dailyReport.save();
 
-    console.log('Daily report created at', new Date());
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    const publicId = `reports/report_${formattedDate}_${Date.now()}.csv`;
+    const csvdata = await dailyReportModel.find({createdAt: getCurrentDateFormatted()}, {
+      total_couponGenerate: 1,
+      total_couponRedeem: 1,
+      totalSendRequest: 1,
+      totalAproveByAdmin: 1,
+      totalForwardByAdmin: 1,
+      totalAmountGive: 1,
+      totalAmountTake: 1,
+      createdAt: 1,
+      time: 1,
+      _id: 0 // Exclude the _id field
+    }).lean().exec();
 
-    // You can add any additional logic or notifications here if needed
+   const json2csv = new Parser();
+    const csvData = json2csv.parse(csvdata);
+   const csvBuffer = Buffer.from(csvData, 'utf-8');
+
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinaryV2.uploader.upload_stream(
+        {
+          public_id: `reports/report_${formattedDate}.csv`,
+          publicId,
+          resource_type: 'raw',
+          folder: 'reports' // Store in a specific folder on Cloudinary
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      // Write the CSV buffer to the upload stream
+      uploadStream.write(csvBuffer);
+      uploadStream.end();
+    });
+
+    console.log('CSV file uploaded to Cloudinary:', uploadResult);
+
+    const isAdmin = await dailyReportModel.findOneAndUpdate(
+      { createdAt:getCurrentDateFormatted() },
+       {  csvfileurl: uploadResult.secure_url },
+     { new: true }
+     );
+
+    await isAdmin.save();
+    console.log('Daily report created at', isAdmin);
 
   } catch (error) {
     console.log(error);
-    // Handle errors or send notifications here
+  
   }
 };
-
-// Start the cron job
-cron.schedule('25 13 * * *',task);
+cron.schedule('53 10 * * *', task);
 
 app.use("/user", user_Router);
 app.use("/admin", admin);
@@ -115,8 +160,8 @@ app.use("/admin/coupons", Coupon_validate);
 app.use("/paymentsettlement", paymentSetlement)
 app.use("/admin/settle", settleMentRoute);
 app.use("/admin/dailyreport", dailyReport);
-app.listen(4200, async () => {
-  console.log("port is listing 4200");
+app.listen(4000, async () => {
+  console.log("port is listing 4000");
   await connection;
 });
 
