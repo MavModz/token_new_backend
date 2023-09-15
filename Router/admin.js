@@ -17,6 +17,7 @@ const coponCode = require("coupon-code");
 const checkoutModel = require("../model/checkout_Model");
 const PaymentSettlement = require("../model/paymentSettle");
 const Notification = require("../model/Notification");
+const { request } = require("express");
 
 const itemsPerPage = 8
 admin.post("/login/:mobile", async (req, res) => {
@@ -1475,9 +1476,9 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
       if (
         data.superAdmin.adminId!==data.sendor.vendorId &&data.superAdmin.adminId!==data.receiver.vendorId &&
         data.sendor.adminId!==data.receiver.vendorId &&
-        data.sendor.status == "rejected" &&
+        data.sendor.status == "requested" &&
         data.receiver.status == "rejected" &&
-        data.superAdmin.status == "rejected"
+        data.superAdmin.status == "forwarded"
       ) {
         console.log("hii")
         data.sendor.status = "requested";
@@ -1497,8 +1498,8 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
       if (
         data.superAdmin.adminId === data.receiver.vendorId && data.superAdmin.adminId!==data.sendor.vendorId &&
         data.sendor.adminId!==data.receiver.vendorId &&
-        data.sendor.status == "rejected" &&
-        data.receiver.status == "rejected" &&
+        data.sendor.status == "requested" &&
+        data.receiver.status == "pending" &&
         data.superAdmin.status == "rejected"
       ) {
         console.log("hii")
@@ -1518,9 +1519,9 @@ admin.patch("/vendor/recieved/request/accept/:_id", loginAuth, async (req, res) 
       if (
         data.superAdmin.adminId === data.sendor.vendorId && data.superAdmin.adminId!==data.receiver.vendorId &&
         data.sendor.adminId!==data.receiver.vendorId &&
-        data.sendor.status == "rejected" &&
+        data.sendor.status == "requested" &&
         data.receiver.status == "rejected" &&
-        data.superAdmin.status == "rejected"
+        data.superAdmin.status == "pending"
       ) {
         console.log("hii")
         data.sendor.status = "pending";
@@ -1864,31 +1865,136 @@ admin.patch("/vendor/recieved/request/rejected/:_id",loginAuth,async (req, res) 
  
   try {
     console.log(req.body)
+    const vendor_id=request.body.vendorId
     const { _id } = req.params;
 
     const data = await VendorSettlement.findOne({ _id });
-
-    if (data.superAdmin.status == "rejected") {
+    if (data.superAdmin.status == "rejected"|| data.sendor.status=="rejected"||data.receiver.status=="rejected") {
       return res.status(409).json({ message: "Already rejected" });
     }
+     
+    if(data.sendor.vendorId!==data.receiver.vendorId && data.superAdmin.adminId!=data.receiver.vendorId&&data.superAdmin.adminId!=data.sendor.vendorId&&data.sendor.status=="requested" &&   data.superAdmin.status=="forwarded" &&   data.receiver.status=="pending" ){
+      data.receiver.status = "rejected";
 
-    data.sendor.status = "rejected";
-    data.superAdmin.status = "rejected";
-    data.receiver.status = "rejected";
-    data.sendor.reject_region = req.body.reject_region;
-    data.superAdmin.reject_region = req.body.reject_region;
-    data.receiver.reject_region = req.body.reject_region;
-
-    const isUpdate = await VendorSettlement.findOneAndUpdate(
-      { _id },
-      { ...data }
-    );
-
-    if (!isUpdate) {
-      return res.status(500).json({ message: "Something went wrong..." });
+      data.sendor.reject_region = req.body.reject_region;
+      data.superAdmin.reject_region = req.body.reject_region;
+      data.receiver.reject_region = req.body.reject_region;
+  
+      const isUpdate = await VendorSettlement.findOneAndUpdate(
+        { _id },
+        { ...data }
+      );
+  
+      if (!isUpdate) {
+        return res.status(500).json({ message: "Something went wrong..." });
+      }
+  
+      return res.status(200).json({ message: "Successfully rejected" });
     }
 
-    return res.status(200).json({ message: "Successfully rejected" });
+    if(data.sendor.vendorId!==data.receiver.vendorId && data.superAdmin.adminId!=data.receiver.vendorId&&data.superAdmin.adminId!=data.sendor.vendorId&&data.sendor.status=="pending" &&   data.superAdmin.status=="requestedback" &&   data.receiver.status=="accepted" ){
+      data.sendor.status = "rejected";
+      data.sendor.reject_region = req.body.reject_region;
+      data.superAdmin.reject_region = req.body.reject_region;
+      data.receiver.reject_region = req.body.reject_region;
+  
+      const isUpdate = await VendorSettlement.findOneAndUpdate(
+        { _id },
+        { ...data }
+      );
+  
+      if (!isUpdate) {
+        return res.status(500).json({ message: "Something went wrong..." });
+      }
+  
+      return res.status(200).json({ message: "Successfully rejected" });
+    }
+
+    if(data.sendor.vendorId!==data.receiver.vendorId && data.superAdmin.adminId===data.receiver.vendorId&&data.superAdmin.adminId!=data.sendor.vendorId&&data.sendor.status=="requested" &&   data.superAdmin.status=="pending" &&   data.receiver.status=="pending" ){
+      data.superAdmin.status = "rejected";
+      data.sendor.reject_region = req.body.reject_region;
+      data.superAdmin.reject_region = req.body.reject_region;
+      data.receiver.reject_region = req.body.reject_region;
+  
+      const isUpdate = await VendorSettlement.findOneAndUpdate(
+        { _id },
+        { ...data }
+      );
+  
+      if (!isUpdate) {
+        return res.status(500).json({ message: "Something went wrong..." });
+      }
+  
+      return res.status(200).json({ message: "Successfully rejected" });
+    }
+    if(data.sendor.vendorId!==data.receiver.vendorId && data.superAdmin.adminId===data.receiver.vendorId&&data.superAdmin.adminId!=data.sendor.vendorId&&data.sendor.status=="pending" &&   data.superAdmin.status=="accepted" &&   data.receiver.status=="pending" ){
+      data.sendor.status = "rejected";
+      data.sendor.reject_region = req.body.reject_region;
+      data.superAdmin.reject_region = req.body.reject_region;
+      data.receiver.reject_region = req.body.reject_region;
+  
+      const isUpdate = await VendorSettlement.findOneAndUpdate(
+        { _id },
+        { ...data }
+      );
+  
+      if (!isUpdate) {
+        return res.status(500).json({ message: "Something went wrong..." });
+      }
+  
+      return res.status(200).json({ message: "Successfully rejected" });
+    }
+    if(data.sendor.vendorId!==data.receiver.vendorId && data.superAdmin.adminId!==data.receiver.vendorId&&data.superAdmin.adminId===data.sendor.vendorId&&data.sendor.status=="requested" &&   data.superAdmin.status=="pending" &&   data.receiver.status=="pending" ){
+      data.receiver.status = "rejected";
+      data.sendor.reject_region = req.body.reject_region;
+      data.superAdmin.reject_region = req.body.reject_region;
+      data.receiver.reject_region = req.body.reject_region;
+  
+      const isUpdate = await VendorSettlement.findOneAndUpdate(
+        { _id },
+        { ...data }
+      );
+  
+      if (!isUpdate) {
+        return res.status(500).json({ message: "Something went wrong..." });
+      }
+  
+      return res.status(200).json({ message: "Successfully rejected" });
+    }
+    if(data.sendor.vendorId!==data.receiver.vendorId && data.superAdmin.adminId!==data.receiver.vendorId&&data.superAdmin.adminId===data.sendor.vendorId&&data.sendor.status=="pending" &&   data.superAdmin.status=="pending" &&   data.receiver.status=="aceepted" ){
+      data.sendor.status = "rejected";
+      data.sendor.reject_region = req.body.reject_region;
+      data.superAdmin.reject_region = req.body.reject_region;
+      data.receiver.reject_region = req.body.reject_region;
+  
+      const isUpdate = await VendorSettlement.findOneAndUpdate(
+        { _id },
+        { ...data }
+      );
+  
+      if (!isUpdate) {
+        return res.status(500).json({ message: "Something went wrong..." });
+      }
+  
+      return res.status(200).json({ message: "Successfully rejected" });
+    }
+    // data.sendor.status = "rejected";
+    // data.superAdmin.status = "rejected";
+
+    // data.sendor.reject_region = req.body.reject_region;
+    // data.superAdmin.reject_region = req.body.reject_region;
+    // data.receiver.reject_region = req.body.reject_region;
+
+    // const isUpdate = await VendorSettlement.findOneAndUpdate(
+    //   { _id },
+    //   { ...data }
+    // );
+
+    // if (!isUpdate) {
+    //   return res.status(500).json({ message: "Something went wrong..." });
+    // }
+
+    // return res.status(200).json({ message: "Successfully rejected" });
   } catch (error) {
     console.error("Error during request rejection:", error);
     res.status(500).json({ message: "Internal server error" });
