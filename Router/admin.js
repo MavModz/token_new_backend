@@ -390,14 +390,23 @@ admin.patch("/approval/:id", AdminAithentication, async (req, res) => {
 
     const isSuperAdmin = await Admin.findById(vendorId);
 
-    if (isSuperAdmin.role !== "admin") {
-      sendNotification(
-        "success",
-        vendorId,
-        "Approved Vendor by Admin",
-        `${isAdmin.phoneNumber} Vendor approved by Admin`
-      );
-    }
+    // if (isSuperAdmin.role !== "admin") {
+    //   sendNotification(
+    //     "success",
+    //     vendorId,
+    //     "Approved Vendor by Admin",
+    //     `${isAdmin.phoneNumber} Vendor approved by Admin`
+    //   );
+    // }
+    const  sendor_name= await Admin.findOne({role:"admin"});
+
+    const newNotification = new Notification({
+      title: "Aproved",
+      message: `Congratulation! You are Aproved by admin`,
+      recipient: id,
+      sendor_name:sendor_name.name,
+    });
+    const savedNotification = await newNotification.save();
 
     return res.status(200).json({ message: "Successfully approved by admin" });
   } catch (error) {
@@ -831,6 +840,24 @@ admin.post("/checkout", loginAuth, async (req, res) => {
             }
           );
           console.log("updated", updatedCoupon);
+          
+
+          const newNotification_vendor = new Notification({
+            title: "copoun Redeem",
+            message: `your coupon redeemed`,
+            recipient: generateCopoun[0]._id,
+            sendor_name: thresholdvalue[0].name,
+          });
+          const savedNotification_vendor = await newNotification_vendor.save();
+
+          const newNotification_user = new Notification({
+            title: "copoun Redeem",
+            message: `your coupon redeemed`,
+            recipient: data[0]._id,
+            sendor_name: thresholdvalue[0].name,
+          });
+          const savedNotification_user = await newNotification_user.save();
+
 
           if(updatedCoupon.generate.vendorId===updatedCoupon.redeem.vendorId){
             const paymentsettlemen = new PaymentSettlement({
@@ -878,7 +905,16 @@ admin.post("/checkout", loginAuth, async (req, res) => {
   
               await coupon.save();
               // return res.status(200).json(`${data[0].name} congrats, you collected ${discount} points from the payment of ${thresholdvalue[0].companyName} and your payment is done  of  ${req.body.amount} rupees`);
+
+              const newNotification = new Notification({
+                title: "copoun Generated",
+                message: `congrats!!,you get the coupon`,
+                recipient: data[0]._id,
+                sendor_name: thresholdvalue[0].name,
+              });
+              const savedNotification = await newNotification.save();
             } 
+            
 
   
             
@@ -952,6 +988,14 @@ admin.post("/checkout", loginAuth, async (req, res) => {
 
             await coupon.save();
             // return res.status(200).json(`${data[0].name} congrats, you collected ${discount} points from the payment of ${thresholdvalue[0].companyName} and your payment is done  of  ${req.body.amount} rupees`);
+            
+            const newNotification = new Notification({
+              title: "copoun Generated",
+              message: `congrats!!,you get the coupon`,
+              recipient: data[0]._id,
+              sendor_name: thresholdvalue[0].name,
+            });
+            const savedNotification = await newNotification.save();
           }
 
           
@@ -1002,6 +1046,18 @@ admin.post("/checkout", loginAuth, async (req, res) => {
 
         const info = new checkoutModel(req.body);
         const response = await info.save();
+
+        // const  sendor_name= await Admin.findOne({role:"admin"});
+    
+        const newNotification = new Notification({
+          title: "copoun Generated",
+          message: `${data[0].name} congrats, you collected ${discount} points from the payment of ${thresholdvalue[0].companyName} and your payment is done  of  ${req.body.amount} rupees`,
+          recipient: data[0]._id,
+          sendor_name: thresholdvalue[0].name,
+        });
+        const savedNotification = await newNotification.save();
+      
+
         return res
           .status(200)
           .json(

@@ -11,6 +11,7 @@ const Product_Router = require("./Router/Product");
 const settleMentRoute = require("./Router/SettlementRoute");
 const paymentSetlement = require("./Router/paymentsetllement");
 const dailyReport=require("./Router/daily_routes")
+const {notification}=require("./Router/Notification")
 const dailyReportModel  = require('./model/daily_reports');
 const CouponModel = require("./model/coupon");
 const VendorSettlement = require("./model/Settlement");
@@ -24,7 +25,7 @@ app.use(express.json());
 
 
 
-  const task = async () => {
+const task = async () => {
   try {
     const data = await CouponModel.find();
     const setle = await VendorSettlement.find();
@@ -147,11 +148,12 @@ app.use(express.json());
   
   }
 };
-cron.schedule('53 10 * * *', task);
+
+cron.schedule('00 23 * * *', task);
+
 
 app.use("/user", user_Router);
 app.use("/admin", admin);
-
 app.use("/personal_info",personal_Info_Router)
 app.use("/admin/payment", paymentRouter);
 app.use("/admin/validate", Coupon_validate);
@@ -160,6 +162,7 @@ app.use("/admin/coupons", Coupon_validate);
 app.use("/paymentsettlement", paymentSetlement)
 app.use("/admin/settle", settleMentRoute);
 app.use("/admin/dailyreport", dailyReport);
+app.use("/notification",notification)
 app.listen(4000, async () => {
   console.log("port is listing 4000");
   await connection;
