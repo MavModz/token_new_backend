@@ -76,79 +76,40 @@ const task = async () => {
       }
       return tba;
     }, 0);
- 
+
     const dailyReport = await dailyReportModel({
       total_couponGenerate,
       total_couponRedeem,
       totalSendRequest,
       totalAproveByAdmin,
       totalForwardByAdmin,
-      totalAmountGive: arr,
+      totalAmountGive: 0,
       totalAmountTake: 0,
       createdAt: getCurrentDateFormatted(),
       time: getCurrentTime(),
       
     });
     const result = await dailyReport.save();
- console.log(result)
+
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
     const publicId = `reports/report_${formattedDate}_${Date.now()}.csv`;
-    // const csvdata = await dailyReportModel.find({createdAt: getCurrentDateFormatted()}, {
-    //   total_couponGenerate: 1,
-    //   total_couponRedeem: 1,
-    //   totalSendRequest: 1,
-    //   totalAproveByAdmin: 1,
-    //   totalForwardByAdmin: 1,
-    //   totalAmountGive:1,
-    //   totalAmountTake: 1,
-    //   createdAt: 1,
-    //   time: 1,
-    //   _id: 0 // Exclude the _id field
-    // }).lean().exec();
+    const csvdata = await dailyReportModel.find({createdAt: getCurrentDateFormatted()}, {
+      total_couponGenerate: 1,
+      total_couponRedeem: 1,
+      totalSendRequest: 1,
+      totalAproveByAdmin: 1,
+      totalForwardByAdmin: 1,
+      totalAmountGive: 1,
+      totalAmountTake: 1,
+      createdAt: 1,
+      time: 1,
+      _id: 0 // Exclude the _id field
+    }).lean().exec();
 
-  //  const json2csv = new Parser();
-  //   const csvData = json2csv.parse(csvdata);
-  //  const csvBuffer = Buffer.from(csvData, 'utf-8');
-
-  const csvdata = await dailyReportModel.find({ createdAt: getCurrentDateFormatted() }).lean().exec();
-
-// Create an array to hold the final CSV data
-const csvRows = [];
-
-csvdata.forEach((row) => {
-  const totalAmountGiveArray = Array.isArray(row.totalAmountGive)
-    ? row.totalAmountGive
-    : [row.totalAmountGive];
-
-  totalAmountGiveArray.forEach((value, index) => {
-    const csvRow = {
-      totalForwardByAdmin: index === 0 ? row.totalForwardByAdmin : '', // Display only once for the first element
-      totalAmountGive: value,
-      totalAmountTake: index === 0 ? row.totalAmountTake : '', // Display only once for the first element
-      createdAt: index === 0 ? row.createdAt : '', // Display only once for the first element
-      time: index === 0 ? row.time : '', // Display only once for the first element
-    };
-
-    if (index === 0) {
-      csvRow.total_couponGenerate = row.total_couponGenerate;
-      csvRow.total_couponRedeem = row.total_couponRedeem;
-      csvRow.totalSendRequest = row.totalSendRequest;
-      csvRow.totalAproveByAdmin = row.totalAproveByAdmin;
-    }
-
-    csvRows.push(csvRow);
-  });
-});
-
-const json2csv = new Parser();
-const csvData = json2csv.parse(csvRows);
-const csvBuffer = Buffer.from(csvData, 'utf-8');
-
-// The rest of your code to upload and save the CSV remains the same...
-
-
-  
+   const json2csv = new Parser();
+    const csvData = json2csv.parse(csvdata);
+   const csvBuffer = Buffer.from(csvData, 'utf-8');
 
     const uploadResult = await new Promise((resolve, reject) => {
       const uploadStream = cloudinaryV2.uploader.upload_stream(
@@ -188,7 +149,7 @@ const csvBuffer = Buffer.from(csvData, 'utf-8');
   }
 };
 
-cron.schedule('35 16 * * *', task);
+cron.schedule('00 23 * * *', task);
 
 
 app.use("/user", user_Router);
@@ -202,11 +163,15 @@ app.use("/paymentsettlement", paymentSetlement)
 app.use("/admin/settle", settleMentRoute);
 app.use("/admin/dailyreport", dailyReport);
 app.use("/notification",notification)
-app.listen(4000, async () => {
-  console.log("port is listing 4000");
-  await connection;
-});
+// app.listen(4000, async () => {
+//   console.log("port is listing 4000");
+//   await connection;
+// });
 
+const port = process.env.PORT || 4200;
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});
 
 function getCurrentDateFormatted() {
   const today = new Date();
