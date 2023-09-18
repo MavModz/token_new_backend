@@ -24,8 +24,21 @@ settleMentRoute.get("/coupon/:TovendorId", loginAuth, async (req, res) => {
 
 
 
+    // const request = coupons.filter((e) => {
+    //   return (
+    //     e.superAdmin.status !== "returning" &&
+    //     e.superAdmin.status !== "accepted" &&
+    //     e.sendor.status !== "accepted" &&
+    //     e.receiver.status !== "accepted"&&
+    //     e.superAdmin.status!=="rejected"&&
+    //     e.sendor.status!=="rejected"&&
+    //     e.receiver.status!=="rejected"
+    //   );
+    // });
     const request = coupons.filter((e) => {
       return (
+        // ( e.superAdmin.status==="pending"&& e.sendor.status==="pending"&&e.receiver.status==="pending"&&e.superAdmin.adminId!==e.sendor.vendorId&&e.superAdmin.adminId!==e.receiver.vendorId||e.receiver.vendorId!==e.sendor.vendorId)||
+
         e.superAdmin.status !== "returning" &&
         e.superAdmin.status !== "accepted" &&
         e.sendor.status !== "accepted" &&

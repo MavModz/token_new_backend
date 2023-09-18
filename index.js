@@ -24,7 +24,6 @@ app.use(cors());
 app.use(express.json());
 
 
-
 const task = async () => {
   try {
     const data = await CouponModel.find();
@@ -76,6 +75,43 @@ const task = async () => {
       }
       return tba;
     }, 0);
+    
+   
+    const totalpending =setle.filter(( e) => {
+      // console.log(e.generate.generateDate)
+      return e.sendor.Date==getCurrentDateFormatted() && e.sendor.status === "requested" && e.superAdmin.status=="pending" && e.receiver.status==="pending"
+    });
+   
+    const totalaprovebyadminArr=setle.filter(( e) => {
+      // console.log(e.generate.generateDate)
+      return (e.sendor.Date==getCurrentDateFormatted() && e.sendor.status === "pending" && e.superAdmin.status=="returning" && e.receiver.status==="accepted") ||
+      (e.sendor.status === "pending" && e.superAdmin.status=="accepted" && e.receiver.status==="pending") ||
+      (e.sendor.status === "pending" && e.superAdmin.status=="pending" && e.receiver.status==="accepted")
+   
+
+    });
+console.log("arr",totalaprovebyadminArr)
+  
+const totalAmountGive = [];
+const totalAmountTake = [];
+
+const senddata = totalpending.map((e) => {
+  totalAmountGive.push(e.sendor.vendorName);
+
+  
+});
+const takedata=totalaprovebyadminArr.map((e) => {
+
+  
+  totalAmountTake.push(e.receiver.vendorName);
+  
+});
+
+totalAmountGive.push(totalAmountGive.length.toString())
+totalAmountTake.push(totalAmountTake.length.toString())
+console.log(totalAmountGive,totalAmountTake)
+ 
+
 
     const dailyReport = await dailyReportModel({
       total_couponGenerate,
@@ -83,33 +119,98 @@ const task = async () => {
       totalSendRequest,
       totalAproveByAdmin,
       totalForwardByAdmin,
-      totalAmountGive: 0,
-      totalAmountTake: 0,
+      totalAmountGive:totalAmountGive,
+      totalAmountTake:totalAmountTake,
       createdAt: getCurrentDateFormatted(),
       time: getCurrentTime(),
       
     });
     const result = await dailyReport.save();
-
+ console.log(result)
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
     const publicId = `reports/report_${formattedDate}_${Date.now()}.csv`;
-    const csvdata = await dailyReportModel.find({createdAt: getCurrentDateFormatted()}, {
-      total_couponGenerate: 1,
-      total_couponRedeem: 1,
-      totalSendRequest: 1,
-      totalAproveByAdmin: 1,
-      totalForwardByAdmin: 1,
-      totalAmountGive: 1,
-      totalAmountTake: 1,
-      createdAt: 1,
-      time: 1,
-      _id: 0 // Exclude the _id field
-    }).lean().exec();
+    // const csvdata = await dailyReportModel.find({createdAt: getCurrentDateFormatted()}, {
+    //   total_couponGenerate: 1,
+    //   total_couponRedeem: 1,
+    //   totalSendRequest: 1,
+    //   totalAproveByAdmin: 1,
+    //   totalForwardByAdmin: 1,
+    //   totalAmountGive:1,
+    //   totalAmountTake: 1,
+    //   createdAt: 1,
+    //   time: 1,
+    //   _id: 0 // Exclude the _id field
+    // }).lean().exec();
 
-   const json2csv = new Parser();
-    const csvData = json2csv.parse(csvdata);
-   const csvBuffer = Buffer.from(csvData, 'utf-8');
+  //  const json2csv = new Parser();
+  //   const csvData = json2csv.parse(csvdata);
+  //  const csvBuffer = Buffer.from(csvData, 'utf-8');
+
+  const csvdata = await dailyReportModel.find({ createdAt: getCurrentDateFormatted() }).lean().exec();
+
+// Create an array to hold the final CSV data
+const csvRows = [];
+
+csvdata.forEach((row) => {
+  const totalAmountGiveArray = Array.isArray(row.totalAmountGive)
+    ? row.totalAmountGive
+    : [row.totalAmountGive];
+
+    const totalAmountTakeArray = Array.isArray(row.totalAmountTake)
+    ? row.totalAmountTake
+    : [row.totalAmountTake];
+
+    const maxLength = Math.max(totalAmountGiveArray.length, totalAmountTakeArray.length);
+
+  // totalAmountGiveArray.forEach((value, index) => {
+  //   const csvRow = {
+  //     totalForwardByAdmin: index === 0 ? row.totalForwardByAdmin : '', // Display only once for the first element
+  //     totalAmountGive: value,
+  //     totalAmountTake: index === 0 ? row.totalAmountTake : '', // Display only once for the first element
+  //     createdAt: index === 0 ? row.createdAt : '', // Display only once for the first element
+  //     time: index === 0 ? row.time : '', // Display only once for the first element
+  //   };
+
+  //   if (index === 0) {
+  //     csvRow.total_couponGenerate = row.total_couponGenerate;
+  //     csvRow.total_couponRedeem = row.total_couponRedeem;
+  //     csvRow.totalSendRequest = row.totalSendRequest;
+  //     csvRow.totalAproveByAdmin = row.totalAproveByAdmin;
+  //   }
+
+  //   csvRows.push(csvRow);
+  // });
+  for (let index = 0; index < maxLength; index++) {
+    const csvRow = {
+      totalForwardByAdmin: index === 0 ? row.totalForwardByAdmin : '', // Display only once for the first element
+      totalAmountGive: totalAmountGiveArray[index] || '', // Use the value if it exists, otherwise ''
+      totalAmountTake: totalAmountTakeArray[index] || '', // Use the value if it exists, otherwise ''
+      createdAt: index === 0 ? row.createdAt : '', // Display only once for the first element
+      time: index === 0 ? row.time : '', // Display only once for the first element
+    };
+
+    if (index === 0) {
+      csvRow.total_couponGenerate = row.total_couponGenerate;
+      csvRow.total_couponRedeem = row.total_couponRedeem;
+      csvRow.totalSendRequest = row.totalSendRequest;
+      csvRow.totalAproveByAdmin = row.totalAproveByAdmin;
+    }
+
+    csvRows.push(csvRow);
+  }
+});
+
+
+
+const json2csv = new Parser();
+const csvData = json2csv.parse(csvRows);
+const csvBuffer = Buffer.from(csvData, 'utf-8');
+
+// The rest of your code to upload and save the CSV remains the same...
+
+
+  
 
     const uploadResult = await new Promise((resolve, reject) => {
       const uploadStream = cloudinaryV2.uploader.upload_stream(
@@ -149,7 +250,8 @@ const task = async () => {
   }
 };
 
-cron.schedule('00 23 * * *', task);
+cron.schedule('25 12 * * *', task);
+
 
 
 app.use("/user", user_Router);

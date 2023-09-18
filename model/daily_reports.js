@@ -8,7 +8,7 @@ const dailyReportSchema = mongoose.Schema({
    totalAproveByAdmin:{ type: Number,  },
    totalForwardByAdmin:{ type: Number, },
    totalAmountGive:[String],
-   totalAmountTake:{ type: Number,},
+   totalAmountTake:[String],
    createdAt:  { type: String, default: "N/A" },
    time:{type:String},
    csvfileurl:{type:String}
